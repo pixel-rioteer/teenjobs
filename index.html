@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeenJobs — every job, every chat, parent included</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --meadow:#2F6B4F;
+    --meadow-dark:#1F4D38;
+    --sky:#EAF4F1;
+    --marigold:#F2A93B;
+    --ink:#1F2A24;
+    --cloud:#FFFFFF;
+    --coral:#E4572E;
+    --line:#D7E4DD;
+    --muted:#5C6B63;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--sky);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+  h1,h2,h3,.brand{font-family:'Fredoka',sans-serif;}
+  .mono{font-family:'IBM Plex Mono',monospace;letter-spacing:0.02em;}
+  a{color:inherit;}
+
+  /* ---- top bar ---- */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 32px;background:var(--cloud);border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:20;
+  }
+  .brand{font-size:22px;font-weight:700;color:var(--meadow-dark);display:flex;align-items:center;gap:8px;}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--marigold);display:inline-block;}
+  .role-switch{display:flex;gap:6px;background:var(--sky);padding:4px;border-radius:999px;}
+  .role-switch button{
+    border:none;background:transparent;padding:8px 16px;border-radius:999px;
+    font-family:'Inter';font-weight:600;font-size:13px;color:var(--muted);cursor:pointer;
+    transition:all .15s ease;
+  }
+  .role-switch button.active{background:var(--meadow);color:white;}
+
+  .wrap{max-width:1040px;margin:0 auto;padding:32px;}
+
+  /* ---- guardian link chip: the signature element ---- */
+  .guardian-chip{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--cloud);border:1px solid var(--line);
+    padding:6px 12px 6px 6px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--meadow-dark);
+  }
+  .chainlink{width:26px;height:16px;flex-shrink:0;}
+  .guardian-banner{
+    display:flex;align-items:center;gap:14px;
+    background:var(--meadow);color:white;padding:14px 20px;border-radius:14px;margin-bottom:24px;
+  }
+  .guardian-banner .chainlink circle{fill:white;}
+  .guardian-banner .chainlink path{stroke:white;}
+  .guardian-banner strong{font-family:'Fredoka';font-weight:600;}
+  .guardian-banner p{margin:2px 0 0;font-size:13px;opacity:.92;}
+
+  /* ---- hero ---- */
+  .hero{padding:8px 0 28px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono';font-size:12px;color:var(--meadow-dark);
+    text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:block;
+  }
+  .hero h1{font-size:40px;line-height:1.1;margin:0 0 12px;color:var(--meadow-dark);max-width:640px;}
+  .hero p{font-size:16px;color:var(--muted);max-width:520px;line-height:1.5;}
+
+  /* ---- job board ---- */
+  .board{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:20px;}
+  .job-card{
+    background:var(--cloud);border:1px solid var(--line);border-radius:16px;padding:18px;
+    display:flex;flex-direction:column;gap:10px;transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .job-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(31,77,56,.08);}
+  .job-top{display:flex;justify-content:space-between;align-items:flex-start;}
+  .job-emoji{font-size:26px;}
+  .job-pay{font-family:'IBM Plex Mono';font-weight:500;font-size:14px;color:var(--meadow-dark);background:var(--sky);padding:3px 9px;border-radius:8px;}
+  .job-card h3{margin:0;font-size:18px;}
+  .job-meta{font-size:13px;color:var(--muted);}
+  .job-tags{display:flex;gap:6px;flex-wrap:wrap;}
+  .tag{font-size:11px;font-family:'IBM Plex Mono';background:var(--sky);color:var(--meadow-dark);padding:3px 8px;border-radius:6px;}
+  .apply-btn{
+    margin-top:6px;border:none;background:var(--marigold);color:var(--ink);font-weight:700;
+    padding:10px;border-radius:10px;cursor:pointer;font-family:'Inter';font-size:14px;
+  }
+  .apply-btn:hover{filter:brightness(1.04);}
+  .apply-btn:disabled{background:var(--line);color:var(--muted);cursor:default;}
+
+  /* ---- parent dashboard ---- */
+  .card{background:var(--cloud);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px;}
+  .card h3{margin:0 0 4px;font-size:16px;}
+  .status-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);}
+  .status-row:first-of-type{border-top:none;}
+  .pill{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;font-family:'IBM Plex Mono';}
+  .pill.pending{background:#FFF1DE;color:#9A5B0F;}
+  .pill.approved{background:#E4F3EA;color:var(--meadow-dark);}
+  .btn-row{display:flex;gap:8px;}
+  .btn-sm{border:none;border-radius:8px;padding:8px 14px;font-weight:600;font-size:13px;cursor:pointer;font-family:'Inter';}
+  .btn-approve{background:var(--meadow);color:white;}
+  .btn-decline{background:var(--sky);color:var(--muted);}
+
+  /* ---- chat ---- */
+  .chat-shell{background:var(--cloud);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .chat-header{background:var(--meadow-dark);color:white;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;}
+  .chat-people{display:flex;gap:-8px;}
+  .avatar-row{display:flex;}
+  .avatar{
+    width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;border:2px solid var(--meadow-dark);margin-left:-8px;
+  }
+  .avatar:first-child{margin-left:0;}
+  .a-child{background:var(--marigold);}
+  .a-parent{background:#8FD4B8;color:var(--meadow-dark);}
+  .a-poster{background:#C9D9EE;color:#2A3A5C;}
+  .chat-lockline{
+    display:flex;align-items:center;gap:8px;font-size:11.5px;color:#EFE6D8;font-family:'IBM Plex Mono';
+    background:rgba(255,255,255,.08);padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .chat-body{padding:18px 20px;display:flex;flex-direction:column;gap:12px;max-height:340px;overflow-y:auto;background:var(--sky);}
+  .msg{max-width:72%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.4;}
+  .msg .who{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:3px;opacity:.65;}
+  .msg.child{background:#FFF3DA;align-self:flex-end;border-bottom-right-radius:4px;}
+  .msg.parent{background:#DFF1E7;align-self:flex-end;border-bottom-right-radius:4px;}
+  .msg.poster{background:var(--cloud);align-self:flex-start;border:1px solid var(--line);border-bottom-left-radius:4px;}
+  .chat-input{display:flex;gap:8px;padding:14px;border-top:1px solid var(--line);background:var(--cloud);}
+  .chat-input input{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-family:'Inter';font-size:14px;}
+  .chat-input button{border:none;background:var(--meadow);color:white;border-radius:10px;padding:10px 18px;font-weight:600;cursor:pointer;}
+
+  .section-title{font-family:'Fredoka';font-size:15px;color:var(--meadow-dark);margin:26px 0 10px;text-transform:uppercase;letter-spacing:.04em;font-size:13px;}
+
+  footer{text-align:center;padding:30px;color:var(--muted);font-size:12.5px;}
+
+  @media (max-width:640px){
+    .hero h1{font-size:30px;}
+    .topbar{padding:14px 18px;}
+    .wrap{padding:20px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span>TeenJobs</div>
+  <div class="role-switch">
+    <button id="btn-child" class="active">I'm the teen</button>
+    <button id="btn-parent">I'm the parent</button>
+  </div>
+</div>
+
+<div class="wrap" id="app"></div>
+
+<footer>TeenJobs prototype — parent accounts required, every chat includes a parent, no exceptions.</footer>
+
+<script>
+const chainlinkSVG = `<svg class="chainlink" viewBox="0 0 26 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="6" cy="8" r="5.5" stroke="#2F6B4F" stroke-width="2"/>
+  <circle cx="20" cy="8" r="5.5" stroke="#2F6B4F" stroke-width="2"/>
+  <path d="M6 8 L20 8" stroke="#2F6B4F" stroke-width="2"/>
+</svg>`;
+
+const jobs = [
+  {id:1, emoji:'🚗', title:'Wash & vacuum the car', pay:'$20', meta:'One-time · This weekend', tags:['Outdoors','One-time'], status:null},
+  {id:2, emoji:'🍂', title:'Rake the back yard', pay:'$25', meta:'One-time · Saturday', tags:['Outdoors','One-time'], status:null},
+  {id:3, emoji:'🪴', title:'Water the plants for the week', pay:'$10', meta:'One-time · This week', tags:['Outdoors','One-time'], status:null},
+  {id:4, emoji:'🧹', title:'Sweep out the garage', pay:'$15', meta:'One-time · Flexible', tags:['Indoors','One-time'], status:null},
+  {id:5, emoji:'🌱', title:'Weed the vegetable garden', pay:'$15', meta:'One-time · Flexible', tags:['Outdoors','One-time'], status:null},
+  {id:6, emoji:'🪟', title:'Wash the front windows', pay:'$18', meta:'One-time · Weekend', tags:['Outdoors','One-time'], status:null},
+];
+
+let state = {
+  role: 'child',
+  applied: {}, // jobId -> 'pending' | 'approved'
+  chatOpenFor: null,
+};
+
+function renderGuardianBanner(){
+  return `<div class="guardian-banner">
+    ${chainlinkSVG.replace('stroke="#2F6B4F"','stroke="white"')}
+    <div><strong>Mia's account is linked to Parent: Dana R.</strong>
+    <p>Every application needs Dana's OK, and Dana is automatically in every chat. There's no way to remove her.</p></div>
+  </div>`;
+}
+
+function renderChildView(){
+  const applyCount = Object.keys(state.applied).length;
+  return `
+    <div class="hero">
+      <span class="eyebrow">Job board · Maple Grove neighborhood</span>
+      <h1>Find a job. Pick your hours.<br>Your parent's always looped in.</h1>
+      <p>Browse tasks nearby, apply in one tap, and once your parent approves, you'll get a group chat with them and the job poster — together.</p>
+    </div>
+    ${renderGuardianBanner()}
+    <div class="section-title">Open jobs near you</div>
+    <div class="board">
+      ${jobs.map(j => renderJobCard(j)).join('')}
+    </div>
+    ${applyCount ? renderChildStatusPanel() : ''}
+    ${state.chatOpenFor ? renderChat(state.chatOpenFor) : ''}
+  `;
+}
+
+function renderJobCard(j){
+  const applied = state.applied[j.id];
+  let btn;
+  if(!applied){
+    btn = `<button class="apply-btn" onclick="applyToJob(${j.id})">Ask to apply</button>`;
+  } else if(applied === 'pending'){
+    btn = `<button class="apply-btn" disabled>Waiting on parent</button>`;
+  } else {
+    btn = `<button class="apply-btn" onclick="openChat(${j.id})">Open chat</button>`;
+  }
+  return `<div class="job-card">
+    <div class="job-top"><span class="job-emoji">${j.emoji}</span><span class="job-pay">${j.pay}</span></div>
+    <h3>${j.title}</h3>
+    <div class="job-meta">${j.meta}</div>
+    <div class="job-tags">${j.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    ${btn}
+  </div>`;
+}
+
+function renderChildStatusPanel(){
+  const rows = Object.entries(state.applied).map(([id, status])=>{
+    const job = jobs.find(j=>j.id==id);
+    return `<div class="status-row">
+      <div><strong>${job.emoji} ${job.title}</strong></div>
+      <span class="pill ${status==='pending'?'pending':'approved'}">${status==='pending' ? 'Pending parent approval' : 'Approved — chat open'}</span>
+    </div>`;
+  }).join('');
+  return `<div class="section-title">Your applications</div><div class="card">${rows}</div>`;
+}
+
+function renderParentView(){
+  const pendingJobs = Object.entries(state.applied).filter(([id,s])=>s==='pending');
+  const approvedJobs = Object.entries(state.applied).filter(([id,s])=>s==='approved');
+  return `
+    <div class="hero">
+      <span class="eyebrow">Parent dashboard · Dana R.</span>
+      <h1>Nothing happens without you.</h1>
+      <p>Approve applications before Mia applies, and stay in every conversation afterward — permanently, not just at first.</p>
+    </div>
+    ${renderGuardianBanner()}
+    <div class="section-title">Waiting on your approval</div>
+    <div class="card">
+      ${pendingJobs.length ? pendingJobs.map(([id])=>{
+        const job = jobs.find(j=>j.id==id);
+        return `<div class="status-row">
+          <div><strong>${job.emoji} ${job.title}</strong><div class="job-meta">${job.meta} · ${job.pay}</div></div>
+          <div class="btn-row">
+            <button class="btn-sm btn-decline" onclick="declineJob(${id})">Decline</button>
+            <button class="btn-sm btn-approve" onclick="approveJob(${id})">Approve</button>
+          </div>
+        </div>`;
+      }).join('') : `<div class="status-row"><span class="job-meta">No pending applications right now.</span></div>`}
+    </div>
+    <div class="section-title">Active — you're in these chats</div>
+    <div class="card">
+      ${approvedJobs.length ? approvedJobs.map(([id])=>{
+        const job = jobs.find(j=>j.id==id);
+        return `<div class="status-row">
+          <div><strong>${job.emoji} ${job.title}</strong></div>
+          <button class="btn-sm btn-approve" onclick="openChat(${id})">Open chat</button>
+        </div>`;
+      }).join('') : `<div class="status-row"><span class="job-meta">Nothing active yet.</span></div>`}
+    </div>
+    ${state.chatOpenFor ? renderChat(state.chatOpenFor) : ''}
+  `;
+}
+
+const sampleMessages = {
+  child: "Hi! I can start this Saturday around 10am, does that work?",
+  poster: "That's perfect, thank you! I'll leave the gate unlocked.",
+  parent: "Sounds good — I'll drop Mia off and pick her up at 12."
+};
+
+function renderChat(jobId){
+  const job = jobs.find(j=>j.id==jobId);
+  return `<div class="section-title">Chat — ${job.title}</div>
+  <div class="chat-shell">
+    <div class="chat-header">
+      <div>
+        <strong>${job.emoji} ${job.title}</strong>
+      </div>
+      <div class="avatar-row">
+        <div class="avatar a-child">M</div>
+        <div class="avatar a-parent">D</div>
+        <div class="avatar a-poster">J</div>
+      </div>
+    </div>
+    <div class="chat-lockline">${chainlinkSVG.replace('viewBox="0 0 26 16"','viewBox="0 0 26 16" style="margin-right:2px"').replace(/#2F6B4F/g,'white')} Mia · Dana (parent) · Jordan (poster) — locked in this chat, can't be removed</div>
+    <div class="chat-body">
+      <div class="msg poster"><span class="who">Jordan · poster</span>${sampleMessages.poster}</div>
+      <div class="msg child"><span class="who">Mia</span>${sampleMessages.child}</div>
+      <div class="msg parent"><span class="who">Dana · parent</span>${sampleMessages.parent}</div>
+    </div>
+    <div class="chat-input">
+      <input type="text" placeholder="Message can be seen by everyone in this chat..." disabled />
+      <button disabled>Send</button>
+    </div>
+  </div>`;
+}
+
+function applyToJob(id){
+  state.applied[id] = 'pending';
+  render();
+}
+function approveJob(id){
+  state.applied[id] = 'approved';
+  render();
+}
+function declineJob(id){
+  delete state.applied[id];
+  render();
+}
+function openChat(id){
+  state.chatOpenFor = id;
+  render();
+  document.querySelector('.chat-shell')?.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = state.role === 'child' ? renderChildView() : renderParentView();
+}
+
+document.getElementById('btn-child').onclick = ()=>{
+  state.role='child';
+  document.getElementById('btn-child').classList.add('active');
+  document.getElementById('btn-parent').classList.remove('active');
+  render();
+};
+document.getElementById('btn-parent').onclick = ()=>{
+  state.role='parent';
+  document.getElementById('btn-parent').classList.add('active');
+  document.getElementById('btn-child').classList.remove('active');
+  render();
+};
+
+render();
+</script>
+</body>
+</html>
