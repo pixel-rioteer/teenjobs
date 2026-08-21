@@ -38,29 +38,27 @@
   }
   .brand{font-size:22px;font-weight:700;color:var(--meadow-dark);display:flex;align-items:center;gap:8px;}
   .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--marigold);display:inline-block;}
-  .role-switch{display:flex;gap:6px;background:var(--sky);padding:4px;border-radius:999px;}
-  .role-switch button{
-    border:none;background:transparent;padding:8px 16px;border-radius:999px;
+  .nav-links{display:flex;align-items:center;gap:10px;}
+  .nav-links button, .nav-links a.navbtn{
+    border:none;background:transparent;padding:8px 14px;border-radius:999px;
     font-family:'Inter';font-weight:600;font-size:13px;color:var(--muted);cursor:pointer;
-    transition:all .15s ease;
+    transition:all .15s ease;text-decoration:none;
   }
-  .role-switch button.active{background:var(--meadow);color:white;}
+  .nav-links button.active, .nav-links a.navbtn.active{background:var(--sky);color:var(--meadow-dark);}
+  .nav-links .who-pill{
+    font-family:'IBM Plex Mono';font-size:11.5px;background:var(--sky);color:var(--meadow-dark);
+    padding:6px 12px;border-radius:999px;font-weight:500;
+  }
+  .logout-btn{background:var(--sky);color:var(--muted);border:none;padding:8px 14px;border-radius:999px;font-weight:600;font-size:13px;cursor:pointer;font-family:'Inter';}
 
   .wrap{max-width:1040px;margin:0 auto;padding:32px;}
 
   /* ---- guardian link chip: the signature element ---- */
-  .guardian-chip{
-    display:inline-flex;align-items:center;gap:8px;
-    background:var(--cloud);border:1px solid var(--line);
-    padding:6px 12px 6px 6px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--meadow-dark);
-  }
   .chainlink{width:26px;height:16px;flex-shrink:0;}
   .guardian-banner{
     display:flex;align-items:center;gap:14px;
     background:var(--meadow);color:white;padding:14px 20px;border-radius:14px;margin-bottom:24px;
   }
-  .guardian-banner .chainlink circle{fill:white;}
-  .guardian-banner .chainlink path{stroke:white;}
   .guardian-banner strong{font-family:'Fredoka';font-weight:600;}
   .guardian-banner p{margin:2px 0 0;font-size:13px;opacity:.92;}
 
@@ -70,14 +68,14 @@
     font-family:'IBM Plex Mono';font-size:12px;color:var(--meadow-dark);
     text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:block;
   }
-  .hero h1{font-size:40px;line-height:1.1;margin:0 0 12px;color:var(--meadow-dark);max-width:640px;}
+  .hero h1{font-size:38px;line-height:1.1;margin:0 0 12px;color:var(--meadow-dark);max-width:640px;}
   .hero p{font-size:16px;color:var(--muted);max-width:520px;line-height:1.5;}
 
   /* ---- job board ---- */
   .board{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:20px;}
   .job-card{
     background:var(--cloud);border:1px solid var(--line);border-radius:16px;padding:18px;
-    display:flex;flex-direction:column;gap:10px;transition:transform .15s ease, box-shadow .15s ease;
+    display:flex;flex-direction:column;gap:10px;transition:transform .15s ease, box-shadow .15s ease;position:relative;
   }
   .job-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(31,77,56,.08);}
   .job-top{display:flex;justify-content:space-between;align-items:flex-start;}
@@ -93,11 +91,18 @@
   }
   .apply-btn:hover{filter:brightness(1.04);}
   .apply-btn:disabled{background:var(--line);color:var(--muted);cursor:default;}
+  .icon-btn{
+    position:absolute;top:14px;right:14px;border:none;background:var(--sky);color:var(--coral);
+    width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;
+    display:flex;align-items:center;justify-content:center;font-weight:700;
+  }
+  .icon-btn:hover{background:#FBE3DA;}
+  .posted-by{font-size:11.5px;color:var(--muted);font-family:'IBM Plex Mono';}
 
   /* ---- parent dashboard ---- */
   .card{background:var(--cloud);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px;}
   .card h3{margin:0 0 4px;font-size:16px;}
-  .status-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);}
+  .status-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);flex-wrap:wrap;}
   .status-row:first-of-type{border-top:none;}
   .pill{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;font-family:'IBM Plex Mono';}
   .pill.pending{background:#FFF1DE;color:#9A5B0F;}
@@ -106,11 +111,22 @@
   .btn-sm{border:none;border-radius:8px;padding:8px 14px;font-weight:600;font-size:13px;cursor:pointer;font-family:'Inter';}
   .btn-approve{background:var(--meadow);color:white;}
   .btn-decline{background:var(--sky);color:var(--muted);}
+  .btn-remove{background:#FBE3DA;color:var(--coral);}
+
+  /* ---- forms ---- */
+  .form-card{background:var(--cloud);border:1px dashed var(--line);border-radius:16px;padding:22px;margin-bottom:24px;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+  .form-grid label{font-size:12.5px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;}
+  .form-grid input, .form-grid select{
+    width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:9px;font-family:'Inter';font-size:14px;
+  }
+  .form-grid .full{grid-column:1/-1;}
+  .form-submit{margin-top:14px;border:none;background:var(--meadow);color:white;font-weight:700;padding:10px 20px;border-radius:10px;cursor:pointer;font-family:'Inter';}
+  .toggle-form-btn{border:none;background:var(--marigold);color:var(--ink);font-weight:700;padding:10px 18px;border-radius:10px;cursor:pointer;margin-bottom:16px;font-family:'Inter';}
 
   /* ---- chat ---- */
   .chat-shell{background:var(--cloud);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
   .chat-header{background:var(--meadow-dark);color:white;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;}
-  .chat-people{display:flex;gap:-8px;}
   .avatar-row{display:flex;}
   .avatar{
     width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
@@ -134,101 +150,187 @@
   .chat-input input{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-family:'Inter';font-size:14px;}
   .chat-input button{border:none;background:var(--meadow);color:white;border-radius:10px;padding:10px 18px;font-weight:600;cursor:pointer;}
 
-  .section-title{font-family:'Fredoka';font-size:15px;color:var(--meadow-dark);margin:26px 0 10px;text-transform:uppercase;letter-spacing:.04em;font-size:13px;}
+  .section-title{font-family:'Fredoka';color:var(--meadow-dark);margin:26px 0 10px;text-transform:uppercase;letter-spacing:.04em;font-size:13px;}
+
+  /* ---- login page ---- */
+  .login-shell{min-height:calc(100vh - 70px);display:flex;align-items:center;justify-content:center;padding:24px;}
+  .login-card{background:var(--cloud);border:1px solid var(--line);border-radius:20px;padding:36px;width:100%;max-width:380px;box-shadow:0 12px 32px rgba(31,77,56,.08);}
+  .login-card h1{font-size:24px;margin:0 0 6px;color:var(--meadow-dark);}
+  .login-card p{color:var(--muted);font-size:13.5px;margin:0 0 22px;}
+  .login-card label{font-size:12.5px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;}
+  .login-card input{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-family:'Inter';font-size:14px;margin-bottom:14px;}
+  .login-submit{width:100%;border:none;background:var(--meadow);color:white;font-weight:700;padding:12px;border-radius:10px;cursor:pointer;font-size:15px;font-family:'Inter';}
+  .login-error{background:#FBE3DA;color:var(--coral);font-size:13px;padding:9px 12px;border-radius:9px;margin-bottom:14px;font-weight:600;}
+  .demo-note{margin-top:18px;font-size:11.5px;color:var(--muted);background:var(--sky);padding:10px 12px;border-radius:10px;line-height:1.5;}
+  .demo-note code{font-family:'IBM Plex Mono';background:white;padding:1px 5px;border-radius:4px;}
+
+  /* ---- about page ---- */
+  .about-hero{padding:8px 0 10px;}
+  .about-block{background:var(--cloud);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:16px;line-height:1.6;color:var(--ink);}
+  .about-block h3{margin-top:0;color:var(--meadow-dark);}
 
   footer{text-align:center;padding:30px;color:var(--muted);font-size:12.5px;}
 
   @media (max-width:640px){
-    .hero h1{font-size:30px;}
-    .topbar{padding:14px 18px;}
+    .hero h1{font-size:28px;}
+    .topbar{padding:14px 18px;flex-wrap:wrap;gap:10px;}
     .wrap{padding:20px;}
+    .form-grid{grid-template-columns:1fr;}
   }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="brand"><span class="dot"></span>TeenJobs</div>
-  <div class="role-switch">
-    <button id="btn-child" class="active">I'm the teen</button>
-    <button id="btn-parent">I'm the parent</button>
-  </div>
-</div>
-
+<div class="topbar" id="topbar"></div>
 <div class="wrap" id="app"></div>
-
-<footer>TeenJobs prototype — parent accounts required, every chat includes a parent, no exceptions.</footer>
+<footer id="footer" style="display:none;">TeenJobs prototype — parent accounts required, every chat includes a parent, no exceptions.</footer>
 
 <script>
 const chainlinkSVG = `<svg class="chainlink" viewBox="0 0 26 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="6" cy="8" r="5.5" stroke="#2F6B4F" stroke-width="2"/>
-  <circle cx="20" cy="8" r="5.5" stroke="#2F6B4F" stroke-width="2"/>
-  <path d="M6 8 L20 8" stroke="#2F6B4F" stroke-width="2"/>
+  <circle cx="6" cy="8" r="5.5" stroke="white" stroke-width="2"/>
+  <circle cx="20" cy="8" r="5.5" stroke="white" stroke-width="2"/>
+  <path d="M6 8 L20 8" stroke="white" stroke-width="2"/>
 </svg>`;
 
-const jobs = [
-  {id:1, emoji:'🚗', title:'Wash & vacuum the car', pay:'$20', meta:'One-time · This weekend', tags:['Outdoors','One-time'], status:null},
-  {id:2, emoji:'🍂', title:'Rake the back yard', pay:'$25', meta:'One-time · Saturday', tags:['Outdoors','One-time'], status:null},
-  {id:3, emoji:'🪴', title:'Water the plants for the week', pay:'$10', meta:'One-time · This week', tags:['Outdoors','One-time'], status:null},
-  {id:4, emoji:'🧹', title:'Sweep out the garage', pay:'$15', meta:'One-time · Flexible', tags:['Indoors','One-time'], status:null},
-  {id:5, emoji:'🌱', title:'Weed the vegetable garden', pay:'$15', meta:'One-time · Flexible', tags:['Outdoors','One-time'], status:null},
-  {id:6, emoji:'🪟', title:'Wash the front windows', pay:'$18', meta:'One-time · Weekend', tags:['Outdoors','One-time'], status:null},
-];
-
-let state = {
-  role: 'child',
-  applied: {}, // jobId -> 'pending' | 'approved'
-  chatOpenFor: null,
+const ACCOUNTS = {
+  parent: {password:'parent123', label:"Dana R. (Parent)"},
+  child:  {password:'child123',  label:"Mia (Teen)"},
+  admin:  {password:'admin123',  label:"Admin"},
 };
 
+let jobs = [
+  {id:1, emoji:'🚗', title:'Wash & vacuum the car', pay:'$20', meta:'One-time · This weekend', tags:['Outdoors','One-time'], postedBy:'Jordan (neighbor)'},
+  {id:2, emoji:'🍂', title:'Rake the back yard', pay:'$25', meta:'One-time · Saturday', tags:['Outdoors','One-time'], postedBy:'Jordan (neighbor)'},
+  {id:3, emoji:'🪴', title:'Water the plants for the week', pay:'$10', meta:'One-time · This week', tags:['Outdoors','One-time'], postedBy:'Sam (neighbor)'},
+  {id:4, emoji:'🧹', title:'Sweep out the garage', pay:'$15', meta:'One-time · Flexible', tags:['Indoors','One-time'], postedBy:'Sam (neighbor)'},
+  {id:5, emoji:'🌱', title:'Weed the vegetable garden', pay:'$15', meta:'One-time · Flexible', tags:['Outdoors','One-time'], postedBy:'Priya (neighbor)'},
+  {id:6, emoji:'🪟', title:'Wash the front windows', pay:'$18', meta:'One-time · Weekend', tags:['Outdoors','One-time'], postedBy:'Priya (neighbor)'},
+];
+let nextJobId = 7;
+
+let state = {
+  loggedInAs: null,   // 'parent' | 'child' | 'admin'
+  view: 'board',       // 'board' | 'about' | 'admin'
+  applied: {},          // jobId -> 'pending' | 'approved'
+  chatOpenFor: null,
+  loginError: '',
+  showAddForm: false,
+};
+
+function chain(){ return chainlinkSVG.replace(/white/g,'#2F6B4F'); }
+
+/* ---------------- LOGIN ---------------- */
+function renderLogin(){
+  document.getElementById('topbar').innerHTML = `<div class="brand"><span class="dot"></span>TeenJobs</div>`;
+  document.getElementById('footer').style.display='none';
+  return `
+  <div class="login-shell">
+    <div class="login-card">
+      <h1>Sign in</h1>
+      <p>Parent and teen accounts are separate — every job still needs parent approval.</p>
+      ${state.loginError ? `<div class="login-error">${state.loginError}</div>` : ''}
+      <label for="li-user">Username</label>
+      <input id="li-user" type="text" placeholder="parent / child / admin" />
+      <label for="li-pass">Password</label>
+      <input id="li-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+      <button class="login-submit" onclick="doLogin()">Sign in</button>
+      <div class="demo-note">Demo logins — <code>parent</code> / <code>parent123</code>, <code>child</code> / <code>child123</code>, <code>admin</code> / <code>admin123</code>.</div>
+    </div>
+  </div>`;
+}
+function doLogin(){
+  const u = document.getElementById('li-user').value.trim().toLowerCase();
+  const p = document.getElementById('li-pass').value;
+  const acc = ACCOUNTS[u];
+  if(acc && acc.password === p){
+    state.loggedInAs = u;
+    state.loginError = '';
+    state.view = u === 'admin' ? 'admin' : 'board';
+    render();
+  } else {
+    state.loginError = 'Wrong username or password.';
+    render();
+  }
+}
+function doLogout(){
+  state.loggedInAs = null;
+  state.view = 'board';
+  state.chatOpenFor = null;
+  render();
+}
+
+/* ---------------- NAV ---------------- */
+function renderTopbar(){
+  const role = state.loggedInAs;
+  const label = ACCOUNTS[role].label;
+  const links = [];
+  links.push(`<button class="${state.view==='board'?'active':''}" onclick="goView('board')">Home</button>`);
+  if(role==='admin') links.push(`<button class="${state.view==='admin'?'active':''}" onclick="goView('admin')">Admin</button>`);
+  links.push(`<button class="${state.view==='about'?'active':''}" onclick="goView('about')">About</button>`);
+  document.getElementById('topbar').innerHTML = `
+    <div class="brand"><span class="dot"></span>TeenJobs</div>
+    <div class="nav-links">
+      ${links.join('')}
+      <span class="who-pill">${label}</span>
+      <button class="logout-btn" onclick="doLogout()">Log out</button>
+    </div>`;
+}
+function goView(v){ state.view = v; state.chatOpenFor=null; render(); }
+
+/* ---------------- SHARED PIECES ---------------- */
 function renderGuardianBanner(){
   return `<div class="guardian-banner">
-    ${chainlinkSVG.replace('stroke="#2F6B4F"','stroke="white"')}
+    ${chainlinkSVG}
     <div><strong>Mia's account is linked to Parent: Dana R.</strong>
     <p>Every application needs Dana's OK, and Dana is automatically in every chat. There's no way to remove her.</p></div>
   </div>`;
 }
 
-function renderChildView(){
-  const applyCount = Object.keys(state.applied).length;
-  return `
-    <div class="hero">
-      <span class="eyebrow">Job board · Maple Grove neighborhood</span>
-      <h1>Find a job. Pick your hours.<br>Your parent's always looped in.</h1>
-      <p>Browse tasks nearby, apply in one tap, and once your parent approves, you'll get a group chat with them and the job poster — together.</p>
-    </div>
-    ${renderGuardianBanner()}
-    <div class="section-title">Open jobs near you</div>
-    <div class="board">
-      ${jobs.map(j => renderJobCard(j)).join('')}
-    </div>
-    ${applyCount ? renderChildStatusPanel() : ''}
-    ${state.chatOpenFor ? renderChat(state.chatOpenFor) : ''}
-  `;
-}
-
-function renderJobCard(j){
+function renderJobCard(j, opts){
+  opts = opts || {};
   const applied = state.applied[j.id];
-  let btn;
-  if(!applied){
-    btn = `<button class="apply-btn" onclick="applyToJob(${j.id})">Ask to apply</button>`;
-  } else if(applied === 'pending'){
-    btn = `<button class="apply-btn" disabled>Waiting on parent</button>`;
-  } else {
-    btn = `<button class="apply-btn" onclick="openChat(${j.id})">Open chat</button>`;
+  let btn = '';
+  if(opts.mode === 'child'){
+    if(!applied){
+      btn = `<button class="apply-btn" onclick="applyToJob(${j.id})">Ask to apply</button>`;
+    } else if(applied === 'pending'){
+      btn = `<button class="apply-btn" disabled>Waiting on parent</button>`;
+    } else {
+      btn = `<button class="apply-btn" onclick="openChat(${j.id})">Open chat</button>`;
+    }
   }
+  const removeBtn = opts.onRemove ? `<button class="icon-btn" title="Remove" onclick="${opts.onRemove}(${j.id})">✕</button>` : '';
   return `<div class="job-card">
+    ${removeBtn}
     <div class="job-top"><span class="job-emoji">${j.emoji}</span><span class="job-pay">${j.pay}</span></div>
     <h3>${j.title}</h3>
     <div class="job-meta">${j.meta}</div>
+    <div class="posted-by">Posted by ${j.postedBy}</div>
     <div class="job-tags">${j.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
     ${btn}
   </div>`;
 }
 
+/* ---------------- CHILD / BOARD VIEW ---------------- */
+function renderChildBoard(){
+  const applyCount = Object.keys(state.applied).length;
+  return `
+    <div class="hero">
+      <span class="eyebrow">Job board · Maple Grove neighborhood</span>
+      <h1>Find a quick job. Pick your hours.<br>Your parent's always looped in.</h1>
+      <p>Browse one-off tasks nearby, apply in one tap, and once your parent approves, you'll get a group chat with them and the job poster — together.</p>
+    </div>
+    ${renderGuardianBanner()}
+    <div class="section-title">Open jobs near you</div>
+    <div class="board">${jobs.map(j => renderJobCard(j, {mode:'child'})).join('')}</div>
+    ${applyCount ? renderChildStatusPanel() : ''}
+    ${state.chatOpenFor ? renderChat(state.chatOpenFor) : ''}
+  `;
+}
 function renderChildStatusPanel(){
   const rows = Object.entries(state.applied).map(([id, status])=>{
     const job = jobs.find(j=>j.id==id);
+    if(!job) return '';
     return `<div class="status-row">
       <div><strong>${job.emoji} ${job.title}</strong></div>
       <span class="pill ${status==='pending'?'pending':'approved'}">${status==='pending' ? 'Pending parent approval' : 'Approved — chat open'}</span>
@@ -237,20 +339,26 @@ function renderChildStatusPanel(){
   return `<div class="section-title">Your applications</div><div class="card">${rows}</div>`;
 }
 
-function renderParentView(){
+/* ---------------- PARENT VIEW ---------------- */
+function renderParentBoard(){
   const pendingJobs = Object.entries(state.applied).filter(([id,s])=>s==='pending');
   const approvedJobs = Object.entries(state.applied).filter(([id,s])=>s==='approved');
   return `
     <div class="hero">
       <span class="eyebrow">Parent dashboard · Dana R.</span>
       <h1>Nothing happens without you.</h1>
-      <p>Approve applications before Mia applies, and stay in every conversation afterward — permanently, not just at first.</p>
+      <p>Post small jobs yourself, approve applications before Mia applies, and stay in every conversation afterward.</p>
     </div>
     ${renderGuardianBanner()}
+
+    <button class="toggle-form-btn" onclick="toggleAddForm()">${state.showAddForm ? 'Close form' : '+ Post a new task'}</button>
+    ${state.showAddForm ? renderAddTaskForm() : ''}
+
     <div class="section-title">Waiting on your approval</div>
     <div class="card">
       ${pendingJobs.length ? pendingJobs.map(([id])=>{
         const job = jobs.find(j=>j.id==id);
+        if(!job) return '';
         return `<div class="status-row">
           <div><strong>${job.emoji} ${job.title}</strong><div class="job-meta">${job.meta} · ${job.pay}</div></div>
           <div class="btn-row">
@@ -260,41 +368,123 @@ function renderParentView(){
         </div>`;
       }).join('') : `<div class="status-row"><span class="job-meta">No pending applications right now.</span></div>`}
     </div>
+
     <div class="section-title">Active — you're in these chats</div>
     <div class="card">
       ${approvedJobs.length ? approvedJobs.map(([id])=>{
         const job = jobs.find(j=>j.id==id);
+        if(!job) return '';
         return `<div class="status-row">
           <div><strong>${job.emoji} ${job.title}</strong></div>
-          <button class="btn-sm btn-approve" onclick="openChat(${id})">Open chat</button>
+          <div class="btn-row">
+            <button class="btn-sm btn-approve" onclick="openChat(${id})">Open chat</button>
+            <button class="btn-sm btn-remove" onclick="revokeApproval(${id})">Remove approval</button>
+          </div>
         </div>`;
       }).join('') : `<div class="status-row"><span class="job-meta">Nothing active yet.</span></div>`}
     </div>
+
+    <div class="section-title">All open jobs</div>
+    <div class="board">${jobs.map(j => renderJobCard(j)).join('')}</div>
     ${state.chatOpenFor ? renderChat(state.chatOpenFor) : ''}
   `;
 }
+function renderAddTaskForm(){
+  return `<div class="form-card">
+    <h3 style="margin-top:0;">Post a new one-off task</h3>
+    <div class="form-grid">
+      <div><label>Emoji</label><input id="nf-emoji" placeholder="🧽" maxlength="2" /></div>
+      <div><label>Pay</label><input id="nf-pay" placeholder="$15" /></div>
+      <div class="full"><label>Title</label><input id="nf-title" placeholder="e.g. Wipe down the patio furniture" /></div>
+      <div class="full"><label>Details</label><input id="nf-meta" placeholder="e.g. One-time · This weekend" /></div>
+      <div><label>Tag</label><input id="nf-tag" placeholder="Outdoors" /></div>
+      <div><label>Posted by</label><input id="nf-poster" placeholder="Dana R. (parent)" value="Dana R. (parent)" /></div>
+    </div>
+    <button class="form-submit" onclick="submitNewTask()">Post task</button>
+  </div>`;
+}
+function toggleAddForm(){ state.showAddForm = !state.showAddForm; render(); }
+function submitNewTask(){
+  const emoji = document.getElementById('nf-emoji').value.trim() || '📋';
+  const title = document.getElementById('nf-title').value.trim();
+  const pay = document.getElementById('nf-pay').value.trim() || '$—';
+  const meta = document.getElementById('nf-meta').value.trim() || 'One-time · Flexible';
+  const tag = document.getElementById('nf-tag').value.trim() || 'One-time';
+  const poster = document.getElementById('nf-poster').value.trim() || 'Dana R. (parent)';
+  if(!title){ return; }
+  jobs.push({id:nextJobId++, emoji, title, pay, meta, tags:[tag,'One-time'], postedBy:poster});
+  state.showAddForm = false;
+  render();
+}
+function revokeApproval(id){
+  delete state.applied[id];
+  if(state.chatOpenFor == id) state.chatOpenFor = null;
+  render();
+}
 
+/* ---------------- ADMIN VIEW ---------------- */
+function renderAdmin(){
+  return `
+    <div class="hero">
+      <span class="eyebrow">Admin console</span>
+      <h1>Moderate the job board.</h1>
+      <p>Remove any listing from the home page. This is separate from parent approval — it takes the task down for everyone.</p>
+    </div>
+    <div class="section-title">All listings (${jobs.length})</div>
+    <div class="board">${jobs.map(j => renderJobCard(j, {onRemove:'adminRemoveJob'})).join('')}</div>
+    ${jobs.length===0 ? `<div class="card"><span class="job-meta">No jobs left on the board.</span></div>` : ''}
+  `;
+}
+function adminRemoveJob(id){
+  jobs = jobs.filter(j=>j.id!=id);
+  // clean up any related application state
+  delete state.applied[id];
+  if(state.chatOpenFor == id) state.chatOpenFor = null;
+  render();
+}
+
+/* ---------------- ABOUT VIEW ---------------- */
+function renderAbout(){
+  return `
+    <div class="about-hero">
+      <span class="eyebrow">About</span>
+      <h1 style="color:var(--meadow-dark);font-size:32px;">Why TeenJobs works this way</h1>
+    </div>
+    <div class="about-block">
+      <h3>The idea</h3>
+      <p>TeenJobs is a neighborhood board for small, one-off chores — washing a car, raking leaves, watering plants — that teens can do for a bit of pocket money. It's built around one rule: a parent is involved at every step.</p>
+    </div>
+    <div class="about-block">
+      <h3>How it stays safe</h3>
+      <p>Parent and teen accounts are separate and linked. A teen can browse and ask to apply, but nothing is confirmed until a parent approves it. Once a job is approved, the chat between the teen and the job poster always includes the parent too — permanently, with no way to remove them.</p>
+    </div>
+    <div class="about-block">
+      <h3>This build</h3>
+      <p>This version is a working prototype: logins, task posting, approvals, and chat are all simulated in the browser so the flow can be reviewed and tested before any real accounts, payments, or messaging are connected.</p>
+    </div>
+  `;
+}
+
+/* ---------------- CHAT ---------------- */
 const sampleMessages = {
   child: "Hi! I can start this Saturday around 10am, does that work?",
   poster: "That's perfect, thank you! I'll leave the gate unlocked.",
   parent: "Sounds good — I'll drop Mia off and pick her up at 12."
 };
-
 function renderChat(jobId){
   const job = jobs.find(j=>j.id==jobId);
+  if(!job) return '';
   return `<div class="section-title">Chat — ${job.title}</div>
   <div class="chat-shell">
     <div class="chat-header">
-      <div>
-        <strong>${job.emoji} ${job.title}</strong>
-      </div>
+      <div><strong>${job.emoji} ${job.title}</strong></div>
       <div class="avatar-row">
         <div class="avatar a-child">M</div>
         <div class="avatar a-parent">D</div>
         <div class="avatar a-poster">J</div>
       </div>
     </div>
-    <div class="chat-lockline">${chainlinkSVG.replace('viewBox="0 0 26 16"','viewBox="0 0 26 16" style="margin-right:2px"').replace(/#2F6B4F/g,'white')} Mia · Dana (parent) · Jordan (poster) — locked in this chat, can't be removed</div>
+    <div class="chat-lockline">${chainlinkSVG} Mia · Dana (parent) · Jordan (poster) — locked in this chat, can't be removed</div>
     <div class="chat-body">
       <div class="msg poster"><span class="who">Jordan · poster</span>${sampleMessages.poster}</div>
       <div class="msg child"><span class="who">Mia</span>${sampleMessages.child}</div>
@@ -306,42 +496,31 @@ function renderChat(jobId){
     </div>
   </div>`;
 }
-
-function applyToJob(id){
-  state.applied[id] = 'pending';
-  render();
-}
-function approveJob(id){
-  state.applied[id] = 'approved';
-  render();
-}
-function declineJob(id){
-  delete state.applied[id];
-  render();
-}
+function applyToJob(id){ state.applied[id] = 'pending'; render(); }
+function approveJob(id){ state.applied[id] = 'approved'; render(); }
+function declineJob(id){ delete state.applied[id]; render(); }
 function openChat(id){
-  state.chatOpenFor = id;
-  render();
+  state.chatOpenFor = id; render();
   document.querySelector('.chat-shell')?.scrollIntoView({behavior:'smooth', block:'center'});
 }
 
+/* ---------------- ROOT RENDER ---------------- */
 function render(){
   const app = document.getElementById('app');
-  app.innerHTML = state.role === 'child' ? renderChildView() : renderParentView();
+  if(!state.loggedInAs){
+    app.innerHTML = renderLogin();
+    document.getElementById('footer').style.display='none';
+    return;
+  }
+  renderTopbar();
+  document.getElementById('footer').style.display='block';
+  if(state.view === 'about'){ app.innerHTML = renderAbout(); return; }
+  if(state.view === 'admin' && state.loggedInAs === 'admin'){ app.innerHTML = renderAdmin(); return; }
+  if(state.loggedInAs === 'parent'){ app.innerHTML = renderParentBoard(); return; }
+  if(state.loggedInAs === 'child'){ app.innerHTML = renderChildBoard(); return; }
+  // admin landing on board view (fallback)
+  app.innerHTML = renderAdmin();
 }
-
-document.getElementById('btn-child').onclick = ()=>{
-  state.role='child';
-  document.getElementById('btn-child').classList.add('active');
-  document.getElementById('btn-parent').classList.remove('active');
-  render();
-};
-document.getElementById('btn-parent').onclick = ()=>{
-  state.role='parent';
-  document.getElementById('btn-parent').classList.add('active');
-  document.getElementById('btn-child').classList.remove('active');
-  render();
-};
 
 render();
 </script>
