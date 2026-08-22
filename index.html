@@ -239,6 +239,23 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
 .sidebar nav button:hover, .sidebar nav button:focus-visible { background: var(--pale); outline: none; }
 .sidebar .btn { margin-top: 12px; text-align: center; }
 
+/* ---------- Chat ---------- */
+.chat-messages {
+  max-height: 340px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 2px;
+  margin: 14px 0;
+}
+.msg { max-width: 82%; padding: 10px 13px; border-radius: 14px; font-size: 14px; line-height: 1.4; }
+.msg .who { font-size: 11px; font-weight: 900; opacity: .7; display: block; margin-bottom: 2px; }
+.msg.me { align-self: flex-end; background: var(--green); color: #fff; border-bottom-right-radius: 4px; }
+.msg.them { align-self: flex-start; background: var(--pale); color: var(--ink); border-bottom-left-radius: 4px; }
+.chat-input-row { display: flex; gap: 8px; }
+.chat-input-row input { flex: 1; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 850px) {
   .hero { grid-template-columns: 1fr; }
@@ -264,6 +281,7 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
     <button onclick="page('safety')">Safety</button>
     <button onclick="page('account')">Create account</button>
     <button onclick="openDashboard()">Dashboard</button>
+    <button onclick="openChatsPage()">Chats</button>
     <button class="btn primary signin" id="authBtn" onclick="signin()">Sign in</button>
   </div>
   <button class="menuBtn" onclick="openSidebar()" aria-label="Open menu">☰</button>
@@ -282,6 +300,7 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
     <button onclick="page('safety');closeSidebar()">Safety</button>
     <button onclick="page('account');closeSidebar()">Create account</button>
     <button onclick="openDashboard();closeSidebar()">Dashboard</button>
+    <button onclick="openChatsPage();closeSidebar()">Chats</button>
   </nav>
   <button class="btn primary" id="authBtnMobile" onclick="signin()">Sign in</button>
 </aside>
@@ -396,6 +415,15 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
     <div class="list" id="pendingJobs"></div>
   </section>
 
+  <section id="chats" class="page">
+    <div class="dashboard">
+      <div class="eyebrow" style="color:#9fe0c8">Chats</div>
+      <h2>Job chats</h2>
+      <p>Once a parent approves a job, the teen, parent and host are all added here so they can talk it through.</p>
+    </div>
+    <div class="list" id="chatsList"></div>
+  </section>
+
   <div class="footer">BobaJob · A full launch needs secure authentication, safeguarding, moderation, privacy and legal review.</div>
 </main>
 
@@ -414,11 +442,15 @@ const SUPABASE_URL = 'https://lsqheqigodbzyfrjrlnx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_iKgzYU6hZyyQ2WQHvrDCAg_PL3d8W-f';
 const ACCOUNT_TABLE = 'account';
 const JOBS_TABLE = 'jobs';
+const CHATS_TABLE = 'chats';
+const MESSAGES_TABLE = 'messages';
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let jobsCache = [];
 let pageHistory = [];
-let currentUser = null; // { email, username, age, role } while signed in
+let currentUser = null; // { email, username, age, role, parent_email } while signed in
+let activeChat = null;  // the chat row currently open in the modal
+let chatChannel = null; // realtime subscription for the open chat
 
 /* ==========================================================
    Navigation
@@ -452,6 +484,13 @@ function openDashboard() {
   }
 }
 
+// Opens the signed-in user's chats page and loads their chat list.
+function openChatsPage() {
+  if (!currentUser) { signin(); return; }
+  page('chats');
+  loadChats();
+}
+
 function openSidebar() {
   document.getElementById('sidebar').classList.add('open');
   document.getElementById('sidebar').setAttribute('aria-hidden', 'false');
@@ -471,6 +510,7 @@ function openModal(body) {
 
 function closeModal() {
   document.getElementById('modal').classList.remove('open');
+  unsubscribeFromChat();
 }
 
 /* ==========================================================
@@ -871,14 +911,27 @@ async function loadTeenPendingJobs() {
   }
 }
 
-// Parent one-click approval (used on the parent's own dashboard). Permanently
-// removes the job from the site.
+// Parent one-click approval (used on the parent's own dashboard). Creates the
+// job chat, then permanently removes the job from the site.
 async function approveJob(id) {
   try {
+    const { data: job, error: fetchErr } = await supabaseClient.from(JOBS_TABLE).select('*').eq('id', id).maybeSingle();
+    if (fetchErr) throw fetchErr;
+    if (job) {
+      const { error: chatErr } = await supabaseClient.from(CHATS_TABLE).insert([{
+        job_id: job.id,
+        job_title: job.title,
+        teen_email: job.taken_by,
+        parent_email: currentUser.email,
+        host_contact: job.set_up_by
+      }]);
+      if (chatErr) throw chatErr;
+    }
     const { error } = await supabaseClient.from(JOBS_TABLE).delete().eq('id', id);
     if (error) throw error;
     loadJobs();
     loadPendingJobs();
+    alert('Approved! A chat with the host has been created — find it on the Chats page.');
   } catch (error) {
     console.error(error);
     alert('Could not approve the job: ' + error.message);
@@ -911,10 +964,23 @@ async function approveFromTeen(id) {
       alert('That parent/guardian password is incorrect.');
       return;
     }
+    const { data: job, error: fetchErr } = await supabaseClient.from(JOBS_TABLE).select('*').eq('id', id).maybeSingle();
+    if (fetchErr) throw fetchErr;
+    if (job) {
+      const { error: chatErr } = await supabaseClient.from(CHATS_TABLE).insert([{
+        job_id: job.id,
+        job_title: job.title,
+        teen_email: currentUser.email,
+        parent_email: currentUser.parent_email,
+        host_contact: job.set_up_by
+      }]);
+      if (chatErr) throw chatErr;
+    }
     const { error: delErr } = await supabaseClient.from(JOBS_TABLE).delete().eq('id', id);
     if (delErr) throw delErr;
     loadJobs();
     loadTeenPendingJobs();
+    alert('Approved! A chat with the host has been created — find it on the Chats page.');
   } catch (error) {
     console.error(error);
     alert('Could not approve the job: ' + error.message);
@@ -931,6 +997,138 @@ async function declineJob(id) {
   } catch (error) {
     console.error(error);
     alert('Could not decline the job: ' + error.message);
+  }
+}
+
+/* ==========================================================
+   Chats
+   ========================================================== */
+// Lists the signed-in user's chats. Teens see chats where they're the
+// claimant; parents/hosts see chats where they're the linked parent or the
+// job's host contact (a host needs a BobaJob account using the same email
+// they posted the job with to see their chats here).
+async function loadChats() {
+  const container = document.getElementById('chatsList');
+  if (!container || !currentUser) return;
+  try {
+    let query = supabaseClient.from(CHATS_TABLE).select('*').order('created_at', { ascending: false });
+    query = currentUser.role === 'child'
+      ? query.eq('teen_email', currentUser.email)
+      : query.or(`parent_email.eq.${currentUser.email},host_contact.eq.${currentUser.email}`);
+    const { data, error } = await query;
+    if (error) throw error;
+    if (!data || !data.length) {
+      container.innerHTML = '<p class="muted">No chats yet. These open automatically once a parent approves a job.</p>';
+      return;
+    }
+    container.innerHTML = data.map(c => `
+      <div class="item">
+        <div><b>${c.job_title || 'Job chat'}</b><div class="muted">Teen: ${c.teen_email || '—'} · Parent: ${c.parent_email || '—'} · Host: ${c.host_contact || '—'}</div></div>
+        <button class="btn primary" onclick="openChat(${c.id})">Open chat</button>
+      </div>`).join('');
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = '<p class="muted">Could not load chats.</p>';
+  }
+}
+
+// Opens a chat in the modal, loads its history, and subscribes to new
+// messages in real time.
+async function openChat(chatId) {
+  try {
+    const { data: chat, error } = await supabaseClient.from(CHATS_TABLE).select('*').eq('id', chatId).maybeSingle();
+    if (error) throw error;
+    if (!chat) { alert('Chat not found.'); return; }
+    activeChat = chat;
+    openModal(`
+      <h2>${chat.job_title || 'Job chat'}</h2>
+      <p class="muted">Teen: ${chat.teen_email || '—'} · Parent: ${chat.parent_email || '—'} · Host: ${chat.host_contact || '—'}</p>
+      <div class="chat-messages" id="chatMessages"><p class="muted">Loading messages...</p></div>
+      <div class="chat-input-row">
+        <input id="chatInput" type="text" placeholder="Write a message..." onkeydown="if(event.key==='Enter'){sendMessage()}">
+        <button class="btn primary" onclick="sendMessage()">Send</button>
+      </div>
+    `);
+    await loadMessages(chatId);
+    subscribeToChat(chatId);
+  } catch (error) {
+    console.error(error);
+    alert('Could not open that chat: ' + error.message);
+  }
+}
+
+async function loadMessages(chatId) {
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+  try {
+    const { data, error } = await supabaseClient
+      .from(MESSAGES_TABLE)
+      .select('*')
+      .eq('chat_id', chatId)
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    renderMessages(data || []);
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = '<p class="muted">Could not load messages.</p>';
+  }
+}
+
+function renderMessages(messages) {
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+  container.innerHTML = messages.length
+    ? messages.map(m => `
+        <div class="msg ${m.sender_email === currentUser.email ? 'me' : 'them'}">
+          <span class="who">${m.sender_label || m.sender_email}</span>${m.body}
+        </div>`).join('')
+    : '<p class="muted">No messages yet — say hello!</p>';
+  container.scrollTop = container.scrollHeight;
+}
+
+// Live-updates the open chat as new messages arrive. Requires the messages
+// table to have realtime replication enabled in Supabase.
+function subscribeToChat(chatId) {
+  if (chatChannel) supabaseClient.removeChannel(chatChannel);
+  chatChannel = supabaseClient
+    .channel(`chat-${chatId}`)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: MESSAGES_TABLE, filter: `chat_id=eq.${chatId}` }, () => {
+      loadMessages(chatId);
+    })
+    .subscribe();
+}
+
+function unsubscribeFromChat() {
+  if (chatChannel) {
+    supabaseClient.removeChannel(chatChannel);
+    chatChannel = null;
+  }
+  activeChat = null;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const body = input ? input.value.trim() : '';
+  if (!body || !activeChat || !currentUser) return;
+
+  let senderRole = 'parent';
+  if (currentUser.role === 'child') senderRole = 'teen';
+  else if (currentUser.email === activeChat.host_contact) senderRole = 'host';
+
+  try {
+    const { error } = await supabaseClient.from(MESSAGES_TABLE).insert([{
+      chat_id: activeChat.id,
+      sender_email: currentUser.email,
+      sender_role: senderRole,
+      sender_label: currentUser.username || currentUser.email,
+      body: body
+    }]);
+    if (error) throw error;
+    input.value = '';
+    loadMessages(activeChat.id);
+  } catch (error) {
+    console.error(error);
+    alert('Could not send message: ' + error.message);
   }
 }
 
