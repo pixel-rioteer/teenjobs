@@ -11,11 +11,65 @@
 </style>
 </head>
 <body>
-<header class="nav"><div class="logo">bob<span>-a-</span>job</div><div class="navlinks"><button onclick="page('home')">Home</button><button onclick="page('jobs')">Find jobs</button><button onclick="page('safety')">Safety</button><button onclick="page('account')">Create account</button><button class="btn primary signin" onclick="signin()">Sign in</button></div></header>
+<header class="nav">
+ <div class="logo">bob<span>a</span>job</div>
+ <div class="navlinks"
+  ><button onclick="page('home')">Home</button>
+  <button onclick="page('jobs')">Find jobs</button>
+  <button onclick="page('safety')">Safety</button>
+  <button onclick="page('account')">Create account</button>
+  <button class="btn primary signin" onclick="signin()">Sign in</button>
+ </div>
+</header>
 <main class="wrap">
-<section id="home" class="page active"><div class="hero"><div><div class="eyebrow">Small jobs · local help · parent approved</div><h1>Safer small jobs for local teenagers.</h1><p>Bob-a-Job helps teens discover suitable tasks, gives adults a simple way to request local help, and keeps parents involved before work is accepted.</p><div class="actions"><button class="btn primary" onclick="page('account')">Create account</button><button class="btn secondary" onclick="page('jobs')">Browse jobs</button><button class="btn secondary" onclick="postJob()">Post a job</button></div></div><div class="dark"><div style="font-size:46px">🛡️</div><h2>Safeguarding first</h2><div class="checks"><div>✓ <b>Teen, parent and adult roles</b><br><small>Accounts capture the right details for each journey.</small></div><div>✓ <b>Approval workflow</b><br><small>Parents approve a specific job before a teen accepts it.</small></div><div>✓ <b>Moderation ready</b><br><small>Listings and reports are designed for review.</small></div></div></div></div><div class="head"><div><h2>Popular jobs</h2><p class="muted">Prototype listings with clear, age-suitable task descriptions.</p></div></div><div class="grid" id="homeJobs"></div></section>
-<section id="jobs" class="page"><div class="head"><div><h2>Find jobs</h2><p class="muted">Browse local opportunities. Rewards are shown as task payments, not virtual currency.</p></div><button class="btn secondary" onclick="alert('Filters: distance, category, reward, date and age suitability.')">Filter</button></div><div class="grid" id="jobsGrid"></div></section>
-<section id="account" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Create account</div><h2>Join Bob-a-Job</h2><p>Create an account record in your Supabase table. Update the table name and fields in the script if your schema differs.</p></div><div class="form-card"><form id="accountForm"><div class="field"><label for="full_name">Full name</label><input id="full_name" name="full_name" autocomplete="name" required placeholder="Alex Taylor"></div><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com"></div><div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="Create a password"></div><div class="field"><label for="age">Age?</label><input id="age" name="age" type="number" min="1" max="120" required placeholder="e.g. 16"></div><div class="field" id="parentEmailField" style="display:none"><label for="parent_email">Parent / guardian email</label><input id="parent_email" name="parent_email" type="email" placeholder="Required for accounts under 18"></div><div class="field"><label for="postcode">Postcode / local area</label><input id="postcode" name="postcode" required placeholder="e.g. SW1A"></div><div class="field"><label for="notes">Safety notes</label><textarea id="notes" name="notes" rows="3" placeholder="Availability, accessibility needs, or anything important for approvals"></textarea></div><button class="btn primary" type="submit" id="accountSubmit">Create account</button><div id="accountMessage" class="notice" role="status">This form writes directly to your Supabase account table.</div></form></div></section>
+<section id="home" class="page active">
+ <div class="hero">
+  <div>
+   <div class="eyebrow">Small jobs · local help · parent approved</div>
+   <h1>Safer small jobs for local teenagers.</h1>
+   <p>Bob-a-Job helps teens discover suitable tasks, gives adults a simple way to request local help, and keeps parents involved before work is accepted.</p>
+   <div class="actions">
+    <button class="btn primary" onclick="page('account')">Create account</button>
+    <button class="btn secondary" onclick="page('jobs')">Browse jobs</button>
+    <button class="btn secondary" onclick="postJob()">Post a job</button>
+   </div>
+  </div>
+  <div class="dark">
+   <div style="font-size:46px">🛡️</div>
+   <h2>Safeguarding first</h2>
+   <div class="checks">
+    <div>✓ <b>Teen, parent and adult roles</b><br>
+     <small>Accounts capture the right details for each journey.</small>
+    </div>
+    <div>✓ <b>Approval workflow</b><br>
+     <small>Parents approve a specific job before a teen accepts it.</small>
+    </div>
+    <div>✓ <b>Moderation ready</b><br>
+     <small>Listings and reports are designed for review.</small>
+    </div>
+   </div>
+  </div>
+ </div>
+ <div class="head">
+  <div>
+   <h2>Popular jobs</h2>
+   <p class="muted">Prototype listings with clear, age-suitable task descriptions.</p>
+  </div>
+ </div>
+ <div class="grid" id="homeJobs">
+ </div>
+</section>
+<section id="jobs" class="page">
+ <div class="head">
+  <div>
+   <h2>Find jobs</h2>
+   <p class="muted">Browse local opportunities. Rewards are shown as task payments, not virtual currency.</p>
+  </div>
+  <button class="btn secondary" onclick="alert('Filters: distance, category, reward, date and age suitability.')">Filter</button>
+ </div>
+ <div class="grid" id="jobsGrid"></div>
+</section>
+<section id="account" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Create account</div><h2>Join BobaJob</h2></div><div class="form-card"><form id="accountForm"><div class="field"><label for="full_name">Full name</label><input id="full_name" name="full_name" autocomplete="name" required placeholder="Robert Baden-powell"></div><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com"></div><div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="Create a password"></div><div class="field"><label for="age">Age?</label><input id="age" name="age" type="number" min="1" max="120" required placeholder="e.g. 16"></div><div class="field" id="parentEmailField" style="display:none"><label for="parent_email">Parent / guardian email</label><input id="parent_email" name="parent_email" type="email" placeholder="Required for accounts under 18"></div><div class="field"><label for="postcode">Postcode / local area</label><input id="postcode" name="postcode" required placeholder="e.g. SW1A"></div><div class="field"><label for="notes">Safety notes</label><textarea id="notes" name="notes" rows="3" placeholder="Availability, accessibility needs, or anything important for approvals"></textarea></div><button class="btn primary" type="submit" id="accountSubmit">Create account</button><div id="accountMessage" class="notice" role="status">This form writes directly to your Supabase account table.</div></form></div></section>
 <section id="safety" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Safety centre</div><h2>Parents are part of the process.</h2><p>In the prototype, a teenager cannot accept a job until a linked parent/guardian approves it.</p></div><div class="grid"><div class="card"><h3>👨‍👩‍👧 Parent link</h3><p class="muted">Teen accounts include a parent or guardian email for approval workflows.</p></div><div class="card"><h3>🔒 Privacy</h3><p class="muted">Only collect details needed to operate the service safely.</p></div><div class="card"><h3>🚩 Reporting</h3><p class="muted">Report jobs, accounts or messages for moderation.</p></div><div class="card"><h3>🧠 Job screening</h3><p class="muted">Listings should be checked for age suitability and local rules.</p></div><div class="card"><h3>💬 Safer messaging</h3><p class="muted">Keep communication on-platform where possible.</p></div><div class="card"><h3>📜 Audit trail</h3><p class="muted">Real systems should record approvals and moderation actions.</p></div></div></section>
 <section id="teen" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Teen dashboard</div><h2>Hi, Alex 👋</h2><p>Parent/guardian: <b>Linked ✓</b></p></div><div class="stats"><div class="stat"><strong>£45</strong><span>Earnings</span></div><div class="stat"><strong>2</strong><span>Jobs completed</span></div><div class="stat"><strong>1</strong><span>Pending approval</span></div><div class="stat"><strong>⭐ 4.9</strong><span>Rating</span></div></div><div class="notice">🔒 You cannot accept a new job until your parent/guardian approves it.</div><div class="card"><div class="row"><div><b>Help tidy the garden</b><p class="muted">£18 · ~2 hours · parent approval required</p></div><button class="btn primary" onclick="alert('Approval request sent to your parent account.')">Ask parent</button></div></div></section>
 <section id="parent" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Parent dashboard</div><h2>Family safety centre</h2><p>Manage linked teenagers and job approvals.</p></div><div class="stats"><div class="stat"><strong>1</strong><span>Linked teen</span></div><div class="stat"><strong>1</strong><span>Pending approval</span></div><div class="stat"><strong>3</strong><span>Jobs completed</span></div><div class="stat"><strong>£45</strong><span>Earnings</span></div></div><div class="notice warning">⏳ Alex wants to accept "Help tidy the garden" for £18.</div><button class="btn primary" onclick="approve()">Approve job</button> <button class="btn danger" onclick="alert('Job declined.')">Decline</button></section>
