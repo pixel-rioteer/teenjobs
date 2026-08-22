@@ -1,5 +1,5 @@
 <!doctype html>
-
+ 
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -14,19 +14,20 @@
 <header class="nav"><div class="logo">bob<span>-a-</span>job</div><div class="navlinks"><button onclick="page('home')">Home</button><button onclick="page('jobs')">Find jobs</button><button onclick="page('safety')">Safety</button><button onclick="page('account')">Create account</button><button class="btn primary signin" onclick="signin()">Sign in</button></div></header>
 <main class="wrap">
 <section id="home" class="page active"><div class="hero"><div><div class="eyebrow">Small jobs · local help · parent approved</div><h1>Safer small jobs for local teenagers.</h1><p>Bob-a-Job helps teens discover suitable tasks, gives adults a simple way to request local help, and keeps parents involved before work is accepted.</p><div class="actions"><button class="btn primary" onclick="page('account')">Create account</button><button class="btn secondary" onclick="page('jobs')">Browse jobs</button><button class="btn secondary" onclick="postJob()">Post a job</button></div></div><div class="dark"><div style="font-size:46px">🛡️</div><h2>Safeguarding first</h2><div class="checks"><div>✓ <b>Teen, parent and adult roles</b><br><small>Accounts capture the right details for each journey.</small></div><div>✓ <b>Approval workflow</b><br><small>Parents approve a specific job before a teen accepts it.</small></div><div>✓ <b>Moderation ready</b><br><small>Listings and reports are designed for review.</small></div></div></div></div><div class="head"><div><h2>Popular jobs</h2><p class="muted">Prototype listings with clear, age-suitable task descriptions.</p></div></div><div class="grid" id="homeJobs"></div></section>
-<section id="jobs" class="page"><div class="head"><div><h2>Find jobs</h2><p class="muted">Browse demo opportunities. Rewards are shown as task payments, not virtual currency.</p></div><button class="btn secondary" onclick="alert('Demo filters: distance, category, reward, date and age suitability.')">Filter</button></div><div class="grid" id="jobsGrid"></div></section>
-<section id="account" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Create account</div><h2>Join Bob-a-Job</h2><p>Create a demo account record in your Supabase table. Update the table name and fields in the script if your schema differs.</p></div><div class="form-card"><form id="accountForm"><div class="field"><label for="full_name">Full name</label><input id="full_name" name="full_name" autocomplete="name" required placeholder="Alex Taylor"></div><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com"></div><div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="Create a password"></div><div class="field"><label for="age">Age</label><input id="age" name="age" type="number" min="1" max="120" required placeholder="e.g. 16"></div><div class="field" id="parentEmailField" style="display:none"><label for="parent_email">Parent / guardian email</label><input id="parent_email" name="parent_email" type="email" placeholder="Required for accounts under 18"></div><div class="field"><label for="postcode">Postcode / local area</label><input id="postcode" name="postcode" required placeholder="e.g. SW1A"></div><div class="field"><label for="notes">Safety notes</label><textarea id="notes" name="notes" rows="3" placeholder="Availability, accessibility needs, or anything important for approvals"></textarea></div><button class="btn primary" type="submit" id="accountSubmit">Create account</button><div id="accountMessage" class="notice" role="status">This form writes directly to your Supabase account table.</div></form></div></section>
+<section id="jobs" class="page"><div class="head"><div><h2>Find jobs</h2><p class="muted">Browse local opportunities. Rewards are shown as task payments, not virtual currency.</p></div><button class="btn secondary" onclick="alert('Filters: distance, category, reward, date and age suitability.')">Filter</button></div><div class="grid" id="jobsGrid"></div></section>
+<section id="account" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Create account</div><h2>Join Bob-a-Job</h2><p>Create an account record in your Supabase table. Update the table name and fields in the script if your schema differs.</p></div><div class="form-card"><form id="accountForm"><div class="field"><label for="full_name">Full name</label><input id="full_name" name="full_name" autocomplete="name" required placeholder="Alex Taylor"></div><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com"></div><div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="Create a password"></div><div class="field"><label for="age">Age?</label><input id="age" name="age" type="number" min="1" max="120" required placeholder="e.g. 16"></div><div class="field" id="parentEmailField" style="display:none"><label for="parent_email">Parent / guardian email</label><input id="parent_email" name="parent_email" type="email" placeholder="Required for accounts under 18"></div><div class="field"><label for="postcode">Postcode / local area</label><input id="postcode" name="postcode" required placeholder="e.g. SW1A"></div><div class="field"><label for="notes">Safety notes</label><textarea id="notes" name="notes" rows="3" placeholder="Availability, accessibility needs, or anything important for approvals"></textarea></div><button class="btn primary" type="submit" id="accountSubmit">Create account</button><div id="accountMessage" class="notice" role="status">This form writes directly to your Supabase account table.</div></form></div></section>
 <section id="safety" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Safety centre</div><h2>Parents are part of the process.</h2><p>In the prototype, a teenager cannot accept a job until a linked parent/guardian approves it.</p></div><div class="grid"><div class="card"><h3>👨‍👩‍👧 Parent link</h3><p class="muted">Teen accounts include a parent or guardian email for approval workflows.</p></div><div class="card"><h3>🔒 Privacy</h3><p class="muted">Only collect details needed to operate the service safely.</p></div><div class="card"><h3>🚩 Reporting</h3><p class="muted">Report jobs, accounts or messages for moderation.</p></div><div class="card"><h3>🧠 Job screening</h3><p class="muted">Listings should be checked for age suitability and local rules.</p></div><div class="card"><h3>💬 Safer messaging</h3><p class="muted">Keep communication on-platform where possible.</p></div><div class="card"><h3>📜 Audit trail</h3><p class="muted">Real systems should record approvals and moderation actions.</p></div></div></section>
-<section id="teen" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Teen dashboard</div><h2>Hi, Alex 👋</h2><p>Parent/guardian: <b>Linked ✓</b></p></div><div class="stats"><div class="stat"><strong>£45</strong><span>Demo earnings</span></div><div class="stat"><strong>2</strong><span>Jobs completed</span></div><div class="stat"><strong>1</strong><span>Pending approval</span></div><div class="stat"><strong>⭐ 4.9</strong><span>Demo rating</span></div></div><div class="notice">🔒 You cannot accept a new job until your parent/guardian approves it.</div><div class="card"><div class="row"><div><b>Help tidy the garden</b><p class="muted">£18 · ~2 hours · parent approval required</p></div><button class="btn primary" onclick="alert('Approval request sent to the parent demo account.')">Ask parent</button></div></div></section>
-<section id="parent" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Parent dashboard</div><h2>Family safety centre</h2><p>Manage linked teenagers and job approvals.</p></div><div class="stats"><div class="stat"><strong>1</strong><span>Linked teen</span></div><div class="stat"><strong>1</strong><span>Pending approval</span></div><div class="stat"><strong>3</strong><span>Jobs completed</span></div><div class="stat"><strong>£45</strong><span>Demo earnings</span></div></div><div class="notice warning">⏳ Alex wants to accept "Help tidy the garden" for £18.</div><button class="btn primary" onclick="approve()">Approve job</button> <button class="btn danger" onclick="alert('Demo: job declined.')">Decline</button></section>
-<section id="adult" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Adult dashboard</div><h2>Your jobs</h2><p>Create small jobs and manage applications.</p></div><div class="stats"><div class="stat"><strong>3</strong><span>Jobs posted</span></div><div class="stat"><strong>1</strong><span>Open</span></div><div class="stat"><strong>2</strong><span>Completed</span></div><div class="stat"><strong>£42</strong><span>Demo paid</span></div></div><button class="btn primary" onclick="postJob()">+ Post a job</button><div class="list" style="margin-top:18px"><div class="item"><div><b>Help tidy the garden</b><div class="muted">Pending moderation</div></div><span class="pill">Review</span></div><div class="item"><div><b>Wash a family car</b><div class="muted">Completed</div></div><span class="pill">Done</span></div></div></section>
-<div class="footer">Bob-a-Job prototype · Demo accounts and jobs are fictional. A real launch needs secure authentication, safeguarding, moderation, privacy and legal review.</div>
+<section id="teen" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Teen dashboard</div><h2>Hi, Alex 👋</h2><p>Parent/guardian: <b>Linked ✓</b></p></div><div class="stats"><div class="stat"><strong>£45</strong><span>Earnings</span></div><div class="stat"><strong>2</strong><span>Jobs completed</span></div><div class="stat"><strong>1</strong><span>Pending approval</span></div><div class="stat"><strong>⭐ 4.9</strong><span>Rating</span></div></div><div class="notice">🔒 You cannot accept a new job until your parent/guardian approves it.</div><div class="card"><div class="row"><div><b>Help tidy the garden</b><p class="muted">£18 · ~2 hours · parent approval required</p></div><button class="btn primary" onclick="alert('Approval request sent to your parent account.')">Ask parent</button></div></div></section>
+<section id="parent" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Parent dashboard</div><h2>Family safety centre</h2><p>Manage linked teenagers and job approvals.</p></div><div class="stats"><div class="stat"><strong>1</strong><span>Linked teen</span></div><div class="stat"><strong>1</strong><span>Pending approval</span></div><div class="stat"><strong>3</strong><span>Jobs completed</span></div><div class="stat"><strong>£45</strong><span>Earnings</span></div></div><div class="notice warning">⏳ Alex wants to accept "Help tidy the garden" for £18.</div><button class="btn primary" onclick="approve()">Approve job</button> <button class="btn danger" onclick="alert('Job declined.')">Decline</button></section>
+<section id="adult" class="page"><div class="dashboard"><div class="eyebrow" style="color:#9fe0c8">Adult dashboard</div><h2>Your jobs</h2><p>Create small jobs and manage applications.</p></div><div class="stats"><div class="stat"><strong>3</strong><span>Jobs posted</span></div><div class="stat"><strong>1</strong><span>Open</span></div><div class="stat"><strong>2</strong><span>Completed</span></div><div class="stat"><strong>£42</strong><span>Paid</span></div></div><button class="btn primary" onclick="postJob()">+ Post a job</button><div class="list" style="margin-top:18px"><div class="item"><div><b>Help tidy the garden</b><div class="muted">Pending moderation</div></div><span class="pill">Review</span></div><div class="item"><div><b>Wash a family car</b><div class="muted">Completed</div></div><span class="pill">Done</span></div></div></section>
+<div class="footer">Bob-a-Job · A full launch needs secure authentication, safeguarding, moderation, privacy and legal review.</div>
 </main>
 <div id="modal" class="modal"><div class="dialog"><button class="close" onclick="closeModal()">×</button><div id="modalBody"></div></div></div>
 <script>
 const SUPABASE_URL='https://lsqheqigodbzyfrjrlnx.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_iKgzYU6hZyyQ2WQHvrDCAg_PL3d8W-f';
 const ACCOUNT_TABLE='account';
+const JOBS_TABLE='jobs';
 const supabaseClient=window.supabase?.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const jobs=[['Garden help','Help tidy the garden','Weeding, sweeping and bagging garden waste. No power tools.','~2 hours',18],['Car care','Wash a family car','Simple exterior wash using supplies provided by the homeowner.','~1 hour',12],['Tech help','Help set up a tablet','Basic settings and showing an adult how to use a few features.','~1 hour',15],['Pet help','Help with a dog walk','A simple daytime dog-walking task with agreed arrangements.','~45 min',10],['House help','Help organise a garage','Sorting and tidying lightweight household items.','~2 hours',16],['Community','Help at a local event','Simple non-hazardous setup or tidy-up work.','~2 hours',20]];
 function page(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');scrollTo(0,0)}
@@ -34,11 +35,72 @@ function cards(list){return list.map((j,i)=>`<article class="card"><span class="
 function render(){document.getElementById('homeJobs').innerHTML=cards(jobs.slice(0,3));document.getElementById('jobsGrid').innerHTML=cards(jobs)}
 function openModal(body){document.getElementById('modalBody').innerHTML=body;document.getElementById('modal').classList.add('open')}
 function closeModal(){document.getElementById('modal').classList.remove('open')}
-function signin(){openModal(`<h2>Sign in</h2><p class="muted">Enter your email and password to sign in, or create a new account.</p><div class="field"><label for="signinEmail">Email</label><input id="signinEmail" type="email" placeholder="you@example.com"></div><div class="field"><label for="signinPassword">Password</label><input id="signinPassword" type="password" placeholder="Your password"></div><div class="actions"><button class="btn primary" onclick="alert('Sign-in is not wired up yet in this build.')">Sign in</button><button class="btn secondary" onclick="createAccountFromSignin()">Create account</button></div>`)}
+function signin(){openModal(`<h2>Sign in</h2><p class="muted">Enter your email and password to sign in, or create a new account.</p><div class="field"><label for="signinEmail">Email</label><input id="signinEmail" type="email" placeholder="you@example.com"></div><div class="field"><label for="signinPassword">Password</label><input id="signinPassword" type="password" placeholder="Your password"></div><div id="signinMessage"></div><div class="actions"><button class="btn primary" id="signinSubmit" onclick="handleSignin()">Sign in</button><button class="btn secondary" onclick="createAccountFromSignin()">Create account</button></div>`)}
+async function handleSignin(){
+  const email=document.getElementById('signinEmail').value.trim();
+  const password=document.getElementById('signinPassword').value;
+  const msg=document.getElementById('signinMessage');
+  const btn=document.getElementById('signinSubmit');
+  if(!email||!password){
+    msg.className='notice warning';
+    msg.textContent='Enter both email and password.';
+    return;
+  }
+  btn.disabled=true;
+  btn.textContent='Signing in...';
+  try{
+    const {data,error}=await supabaseClient.from(ACCOUNT_TABLE).select('*').eq('email',email).eq('password',password).maybeSingle();
+    if(error)throw error;
+    if(!data){
+      msg.className='notice warning';
+      msg.textContent='No account matches that email and password.';
+      return;
+    }
+    closeModal();
+    page(data.age&&data.age<18?'teen':'adult');
+  }catch(error){
+    console.error(error);
+    msg.className='notice warning';
+    msg.textContent='Could not sign in: '+error.message;
+  }finally{
+    btn.disabled=false;
+    btn.textContent='Sign in';
+  }
+}
 function createAccountFromSignin(){closeModal();page('account');document.getElementById('full_name')?.focus()}
 function viewJob(i){let j=jobs[i];openModal(`<h2>${j[1]}</h2><span class="tag">${j[0]}</span><p class="muted">${j[2]}</p><p><b>Time:</b> ${j[3]}<br><b>Reward:</b> £${j[4]}</p><div class="notice">🔒 A linked parent/guardian must approve this job before a teen can accept it.</div><button class="btn primary" onclick="page('parent');closeModal()">Send to parent for approval</button>`)}
-function postJob(){openModal(`<h2>Post a job</h2><div class="field"><label>Job title</label><input placeholder="e.g. Help tidy my garden"></div><div class="field"><label>Description</label><textarea rows="4" placeholder="Describe the small task"></textarea></div><div class="field"><label>Reward (£)</label><input type="number" value="15"></div><div class="notice">Listings should pass safety and moderation checks before being shown to teenagers.</div><button class="btn primary" onclick="closeModal();page('adult');alert('Demo job submitted for moderation.')">Submit for review</button>`)}
-function approve(){alert('Demo: parent approved the job. The teen can now accept it.');page('teen')}
+function postJob(){openModal(`<h2>Post a job</h2><div class="field"><label for="jobTitle">Job title</label><input id="jobTitle" placeholder="e.g. Help tidy my garden"></div><div class="field"><label for="jobDesc">Description</label><textarea id="jobDesc" rows="4" placeholder="Describe the small task"></textarea></div><div class="field"><label for="jobPrice">Price (£)</label><input id="jobPrice" type="number" value="15" min="1"></div><div class="field"><label for="jobSetupBy">Posted by (name or email)</label><input id="jobSetupBy" placeholder="you@example.com"></div><div id="jobMessage" class="notice">Listings should pass safety and moderation checks before being shown to teenagers.</div><button class="btn primary" id="jobSubmitBtn" onclick="submitJob()">Submit for review</button>`)}
+async function submitJob(){
+  const price=parseInt(document.getElementById('jobPrice').value,10);
+  const setUpBy=document.getElementById('jobSetupBy').value.trim();
+  const msg=document.getElementById('jobMessage');
+  const btn=document.getElementById('jobSubmitBtn');
+  if(!setUpBy||isNaN(price)){
+    msg.className='notice warning';
+    msg.textContent='Enter a price and who is posting this job.';
+    return;
+  }
+  btn.disabled=true;
+  btn.textContent='Submitting...';
+  try{
+    // title/description stay local to the modal; only columns on the 'jobs' table are sent.
+    const {error}=await supabaseClient.from(JOBS_TABLE).insert([{price:price,set_up_by:setUpBy,taken:false}]);
+    if(error)throw error;
+    msg.className='notice success';
+    msg.textContent='Job submitted. Check your Supabase jobs table for the new row.';
+    document.getElementById('jobTitle').value='';
+    document.getElementById('jobDesc').value='';
+    document.getElementById('jobSetupBy').value='';
+  }catch(error){
+    console.error(error);
+    msg.className='notice warning';
+    msg.textContent='Could not submit job: '+error.message;
+  }finally{
+    btn.disabled=false;
+    btn.textContent='Submit for review';
+  }
+}
+function approve(){alert('Parent approved the job. The teen can now accept it.');page('teen')}
 document.getElementById('age').addEventListener('input',function(){
   const age=parseInt(this.value,10);
   const field=document.getElementById('parentEmailField');
