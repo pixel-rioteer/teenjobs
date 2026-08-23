@@ -313,7 +313,9 @@ body.dark .dialog { background: var(--card); }
     <button onclick="openChatsPage()">Chats</button>
     <button onclick="openProfilePage()">Profile</button>
     <span class="sep"></span>
-    <button onclick="page('account')">Create account</button>
+    <button onclick="openSwitchProfile()">Switch profile</button>
+    <span class="sep"></span>
+    <button onclick="page('account')" id="createAccountNavBtn">Create account</button>
     <button class="btn primary signin" id="authBtn" onclick="signin()">Sign in</button>
   </div>
   <button class="menuBtn" onclick="openSidebar()" aria-label="Open menu">☰</button>
@@ -335,8 +337,9 @@ body.dark .dialog { background: var(--card); }
     <button onclick="openDashboard();closeSidebar()">Dashboard</button>
     <button onclick="openChatsPage();closeSidebar()">Chats</button>
     <button onclick="openProfilePage();closeSidebar()">Profile</button>
+    <button onclick="openSwitchProfile();closeSidebar()">Switch profile</button>
     <div class="sidebar-label">Account</div>
-    <button onclick="page('account');closeSidebar()">Create account</button>
+    <button onclick="page('account');closeSidebar()" id="createAccountNavBtnMobile">Create account</button>
   </nav>
   <button class="btn primary" id="authBtnMobile" onclick="signin()">Sign in</button>
 </aside>
@@ -618,21 +621,96 @@ function closeModal() {
 function updateAuthUI() {
   const btn = document.getElementById('authBtn');
   const mobileBtn = document.getElementById('authBtnMobile');
+  const createBtn = document.getElementById('createAccountNavBtn');
+  const createBtnMobile = document.getElementById('createAccountNavBtnMobile');
   if (currentUser) {
     btn.textContent = 'Log out';
     btn.onclick = logout;
     if (mobileBtn) { mobileBtn.textContent = 'Log out'; mobileBtn.onclick = () => { logout(); closeSidebar(); }; }
+    if (createBtn) createBtn.style.display = 'none';
+    if (createBtnMobile) createBtnMobile.style.display = 'none';
   } else {
     btn.textContent = 'Sign in';
     btn.onclick = signin;
     if (mobileBtn) { mobileBtn.textContent = 'Sign in'; mobileBtn.onclick = () => { signin(); closeSidebar(); }; }
+    if (createBtn) createBtn.style.display = '';
+    if (createBtnMobile) createBtnMobile.style.display = '';
   }
 }
 
 function logout() {
   currentUser = null;
+  localStorage.removeItem('bobajob-session');
   updateAuthUI();
   page('home');
+}
+
+// Saves the active session so a page refresh doesn't sign the user out.
+function saveSession() {
+  if (currentUser) localStorage.setItem('bobajob-session', JSON.stringify(currentUser));
+  else localStorage.removeItem('bobajob-session');
+}
+
+// Remembers every account that has signed in on this device so they can be
+// switched between without re-entering a password each time.
+function saveToProfilesList() {
+  if (!currentUser) return;
+  let profiles = JSON.parse(localStorage.getItem('bobajob-profiles') || '[]');
+  profiles = profiles.filter(p => p.email !== currentUser.email);
+  profiles.push(currentUser);
+  localStorage.setItem('bobajob-profiles', JSON.stringify(profiles));
+}
+
+function removeFromProfilesList(email) {
+  let profiles = JSON.parse(localStorage.getItem('bobajob-profiles') || '[]');
+  profiles = profiles.filter(p => p.email !== email);
+  localStorage.setItem('bobajob-profiles', JSON.stringify(profiles));
+}
+
+// Re-signs the user in from a saved session on page load. Re-checks against
+// Supabase so a deleted or edited account is reflected correctly.
+async function restoreSession() {
+  const saved = localStorage.getItem('bobajob-session');
+  if (!saved) return;
+  try {
+    const parsed = JSON.parse(saved);
+    const { data, error } = await supabaseClient.from(ACCOUNT_TABLE).select('*').eq('email', parsed.email).maybeSingle();
+    if (error) throw error;
+    if (!data) { localStorage.removeItem('bobajob-session'); return; }
+    setCurrentUserFromRow(data);
+    updateAuthUI();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function openSwitchProfile() {
+  const profiles = JSON.parse(localStorage.getItem('bobajob-profiles') || '[]');
+  if (!profiles.length) { signin(); return; }
+  openModal(`
+    <h2>Switch profile</h2>
+    <p class="muted">Accounts that have signed in on this device.</p>
+    <div class="list">
+      ${profiles.map(p => `
+        <div class="item">
+          <div><b>${p.username || p.email}</b><div class="muted">${p.role === 'child' ? 'Teen' : 'Parent/guardian'} · ${p.email}</div></div>
+          <button class="btn secondary" onclick="switchToProfile('${p.email}')">Switch</button>
+        </div>`).join('')}
+    </div>
+    <button class="btn primary" style="margin-top:14px;width:100%" onclick="closeModal();signin()">Add another account</button>
+  `);
+}
+
+function switchToProfile(email) {
+  const profiles = JSON.parse(localStorage.getItem('bobajob-profiles') || '[]');
+  const found = profiles.find(p => p.email === email);
+  if (!found) { alert('Profile not found.'); return; }
+  currentUser = found;
+  saveSession();
+  updateAuthUI();
+  closeModal();
+  if (currentUser.role === 'child') { page('teen'); refreshTeenJobLists(); }
+  else { page('adult'); refreshAdultJobLists(); }
 }
 
 function signin() {
@@ -684,6 +762,8 @@ async function handleSignin() {
     }
     setCurrentUserFromRow(data);
     updateAuthUI();
+    saveSession();
+    saveToProfilesList();
     closeModal();
     if (currentUser.role === 'child') { page('teen'); refreshTeenJobLists(); }
     else { page('adult'); refreshAdultJobLists(); }
@@ -788,6 +868,8 @@ document.getElementById('accountForm').addEventListener('submit', async e => {
     form.reset();
     setCurrentUserFromRow(row);
     updateAuthUI();
+    saveSession();
+    saveToProfilesList();
     setTimeout(() => {
       if (currentUser.role === 'child') { page('teen'); refreshTeenJobLists(); }
       else { page('adult'); refreshAdultJobLists(); }
@@ -1228,6 +1310,7 @@ async function openChat(chatId) {
     if (error) throw error;
     if (!chat) { alert('Chat not found.'); return; }
     activeChat = chat;
+    const isHost = currentUser && currentUser.email === chat.host_contact;
     openModal(`
       <h2>${chat.job_title || 'Job chat'}</h2>
       <p class="muted">Teen: ${chat.teen_email || '—'} · Parent: ${chat.parent_email || '—'} · Host: ${chat.host_contact || '—'}</p>
@@ -1236,12 +1319,39 @@ async function openChat(chatId) {
         <input id="chatInput" type="text" placeholder="Write a message..." onkeydown="if(event.key==='Enter'){sendMessage()}">
         <button class="btn primary" onclick="sendMessage()">Send</button>
       </div>
+      ${isHost ? '<button class="btn danger" style="margin-top:14px;width:100%" onclick="deleteChatAndJob()">Mark job as done &amp; delete chat</button>' : ''}
     `);
     await loadMessages(chatId);
     subscribeToChat(chatId);
   } catch (error) {
     console.error(error);
     alert('Could not open that chat: ' + error.message);
+  }
+}
+
+// Host-only: deletes the chat and its messages, and removes the underlying
+// job so it disappears from the parent's and teen's approved-jobs lists.
+async function deleteChatAndJob() {
+  if (!activeChat || !currentUser || currentUser.email !== activeChat.host_contact) return;
+  const confirmed = confirm('Mark this job as done and delete the chat? This removes it for everyone.');
+  if (!confirmed) return;
+  try {
+    const { error: msgErr } = await supabaseClient.from(MESSAGES_TABLE).delete().eq('chat_id', activeChat.id);
+    if (msgErr) throw msgErr;
+    const { error: chatErr } = await supabaseClient.from(CHATS_TABLE).delete().eq('id', activeChat.id);
+    if (chatErr) throw chatErr;
+    if (activeChat.job_id) {
+      const { error: jobErr } = await supabaseClient.from(JOBS_TABLE).delete().eq('id', activeChat.job_id);
+      if (jobErr) throw jobErr;
+    }
+    closeModal();
+    loadJobs();
+    refreshAdultJobLists();
+    refreshTeenJobLists();
+    loadChats();
+  } catch (error) {
+    console.error(error);
+    alert('Could not delete the chat: ' + error.message);
   }
 }
 
@@ -1352,6 +1462,8 @@ async function uploadAvatar() {
     const { error: updateErr } = await supabaseClient.from(ACCOUNT_TABLE).update({ avatar_url: avatarUrl }).eq('email', currentUser.email);
     if (updateErr) throw updateErr;
     currentUser.avatar_url = avatarUrl;
+    saveSession();
+    saveToProfilesList();
     renderProfilePage();
   } catch (error) {
     console.error(error);
@@ -1367,6 +1479,8 @@ async function updateUsername() {
     if (error) throw error;
     currentUser.username = newUsername;
     updateAuthUI();
+    saveSession();
+    saveToProfilesList();
     renderProfilePage();
   } catch (error) {
     console.error(error);
@@ -1394,7 +1508,9 @@ async function deleteAccount() {
   try {
     const { error } = await supabaseClient.from(ACCOUNT_TABLE).delete().eq('email', currentUser.email);
     if (error) throw error;
+    removeFromProfilesList(currentUser.email);
     currentUser = null;
+    saveSession();
     updateAuthUI();
     page('home');
   } catch (error) {
@@ -1402,6 +1518,7 @@ async function deleteAccount() {
     alert('Could not delete account: ' + error.message);
   }
 }
+
 
 /* ==========================================================
    Init
@@ -1414,6 +1531,7 @@ document.addEventListener('keydown', e => {
 });
 if (localStorage.getItem('bobajob-dark') === '1') document.body.classList.add('dark');
 updateAuthUI();
+restoreSession();
 loadJobs();
 </script>
 </body>
