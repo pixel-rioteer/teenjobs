@@ -31,6 +31,21 @@ body {
 button, input, select, textarea { font: inherit; }
 button, a { touch-action: manipulation; }
 
+/* ---------- Dark mode ---------- */
+body.dark {
+  --bg: #0f1c19;
+  --card: #15332d;
+  --ink: #eef7f2;
+  --muted: #9db3ac;
+  --line: #25443c;
+  --pale: #1c3a32;
+}
+body.dark { background: radial-gradient(circle at top left, #14261f 0, #0f1c19 36%, #0b1512 100%); }
+body.dark .nav { background: #15332dd9; }
+body.dark .card, body.dark .item, body.dark .form-card { background: var(--card); }
+body.dark .field input, body.dark .field select, body.dark .field textarea { background: var(--card); color: var(--ink); }
+body.dark .sidebar { background: var(--card); }
+
 /* ---------- Nav ---------- */
 .nav {
   min-height: 72px;
@@ -47,7 +62,7 @@ button, a { touch-action: manipulation; }
 }
 .logo { font-size: 24px; font-weight: 950; letter-spacing: -.8px; }
 .logo span { color: var(--green); }
-.navlinks { display: flex; align-items: center; gap: 8px; }
+.navlinks { display: flex; align-items: center; gap: 4px; }
 .navlinks button {
   border: 0;
   background: transparent;
@@ -58,6 +73,7 @@ button, a { touch-action: manipulation; }
   cursor: pointer;
 }
 .navlinks button:hover, .navlinks button:focus-visible { background: var(--pale); outline: none; }
+.navlinks .sep { width: 1px; height: 22px; background: var(--line); margin: 0 6px; }
 
 /* ---------- Layout ---------- */
 .wrap { max-width: 1180px; margin: auto; padding: 34px 20px 72px; }
@@ -90,6 +106,7 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
 .primary { background: var(--green); color: #fff; box-shadow: 0 14px 34px rgba(47,143,115,.22); }
 .primary:hover { background: var(--green-dark); }
 .secondary { background: #fff; border: 1px solid var(--line); color: var(--ink); }
+body.dark .secondary { background: var(--card); }
 .danger { background: #fff0ee; color: #a33; border: 1px solid #efcbc7; }
 
 /* ---------- Panels ---------- */
@@ -159,6 +176,7 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
 .list { display: grid; gap: 11px; }
 .item { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .tag.closed { background: #fdeceb; color: #a33; }
+.tag.approved { background: #ecfff7; color: #126146; }
 
 /* ---------- Modal ---------- */
 .modal {
@@ -173,7 +191,8 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
 }
 .modal.open { display: flex; }
 .dialog { background: #fff; width: min(560px,100%); border-radius: 22px; padding: 28px; position: relative; max-height: 90vh; overflow: auto; }
-.close { position: absolute; right: 14px; top: 9px; border: 0; background: none; font-size: 28px; cursor: pointer; }
+body.dark .dialog { background: var(--card); }
+.close { position: absolute; right: 14px; top: 9px; border: 0; background: none; font-size: 28px; cursor: pointer; color: var(--ink); }
 
 /* ---------- Forms ---------- */
 .field { display: grid; gap: 7px; margin: 13px 0; }
@@ -223,6 +242,7 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
 .sidebar.open { right: 0; }
 .sidebar-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .sidebar-head .logo { font-size: 20px; }
+.sidebar-label { font-size: 11px; font-weight: 950; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin: 16px 10px 4px; }
 .sidebar nav { display: flex; flex-direction: column; gap: 2px; }
 .sidebar nav button {
   width: 100%;
@@ -256,6 +276,14 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
 .chat-input-row { display: flex; gap: 8px; }
 .chat-input-row input { flex: 1; }
 
+/* ---------- Profile ---------- */
+.avatar-circle {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--pale); display: flex; align-items: center; justify-content: center;
+  font-size: 26px; overflow: hidden; flex-shrink: 0;
+}
+.avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 850px) {
   .hero { grid-template-columns: 1fr; }
@@ -276,12 +304,16 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
   <div class="logo">Boba<span>Job</span></div>
   <div class="navlinks">
     <button onclick="goBack()">← Back</button>
+    <span class="sep"></span>
     <button onclick="page('home')">Home</button>
     <button onclick="page('jobs')">Find jobs</button>
     <button onclick="page('safety')">Safety</button>
-    <button onclick="page('account')">Create account</button>
+    <span class="sep"></span>
     <button onclick="openDashboard()">Dashboard</button>
     <button onclick="openChatsPage()">Chats</button>
+    <button onclick="openProfilePage()">Profile</button>
+    <span class="sep"></span>
+    <button onclick="page('account')">Create account</button>
     <button class="btn primary signin" id="authBtn" onclick="signin()">Sign in</button>
   </div>
   <button class="menuBtn" onclick="openSidebar()" aria-label="Open menu">☰</button>
@@ -295,12 +327,16 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
   </div>
   <nav>
     <button onclick="goBack();closeSidebar()">← Back</button>
+    <div class="sidebar-label">Browse</div>
     <button onclick="page('home');closeSidebar()">Home</button>
     <button onclick="page('jobs');closeSidebar()">Find jobs</button>
     <button onclick="page('safety');closeSidebar()">Safety</button>
-    <button onclick="page('account');closeSidebar()">Create account</button>
+    <div class="sidebar-label">Your account</div>
     <button onclick="openDashboard();closeSidebar()">Dashboard</button>
     <button onclick="openChatsPage();closeSidebar()">Chats</button>
+    <button onclick="openProfilePage();closeSidebar()">Profile</button>
+    <div class="sidebar-label">Account</div>
+    <button onclick="page('account');closeSidebar()">Create account</button>
   </nav>
   <button class="btn primary" id="authBtnMobile" onclick="signin()">Sign in</button>
 </aside>
@@ -400,6 +436,10 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
       <div><h2>Waiting for approval</h2><p class="muted">Your parent or guardian can approve these below by entering their password.</p></div>
     </div>
     <div class="list" id="teenPendingJobs"></div>
+    <div class="head" style="margin-top:28px">
+      <div><h2>Approved jobs</h2><p class="muted">You're all set to do these. Open the chat to sort out details.</p></div>
+    </div>
+    <div class="list" id="teenApprovedJobs"></div>
   </section>
 
   <section id="adult" class="page">
@@ -413,6 +453,10 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
       <div><h2>Pending approval</h2><p class="muted">Jobs your linked teen wants to do. Jobs are hidden from other teens while they wait here.</p></div>
     </div>
     <div class="list" id="pendingJobs"></div>
+    <div class="head" style="margin-top:28px">
+      <div><h2>Approved jobs</h2><p class="muted">Jobs you've approved. Chat with the host and your teen here.</p></div>
+    </div>
+    <div class="list" id="approvedJobs"></div>
   </section>
 
   <section id="chats" class="page">
@@ -422,6 +466,41 @@ h2 { letter-spacing: -1.5px; font-size: clamp(30px,4vw,42px); margin: 0 0 10px; 
       <p>Once a parent approves a job, the teen, parent and host are all added here so they can talk it through.</p>
     </div>
     <div class="list" id="chatsList"></div>
+  </section>
+
+  <section id="profile" class="page">
+    <div class="dashboard">
+      <div class="eyebrow" style="color:#9fe0c8">Profile</div>
+      <h2 id="profileGreeting">Your profile</h2>
+      <p id="profileDetails">Manage your picture, account details and app settings.</p>
+    </div>
+
+    <div class="form-card">
+      <h3 style="margin-top:0">Profile picture</h3>
+      <div class="row" style="justify-content:flex-start;gap:16px">
+        <div class="avatar-circle" id="avatarCircle">🙂</div>
+        <input type="file" id="avatarFile" accept="image/*">
+      </div>
+      <button class="btn secondary" style="margin-top:14px" onclick="uploadAvatar()">Upload picture</button>
+    </div>
+
+    <div class="form-card" style="margin-top:16px">
+      <h3 style="margin-top:0">Account details</h3>
+      <div class="field"><label for="profileUsername">Username</label><input id="profileUsername" placeholder="Your username"></div>
+      <button class="btn secondary" onclick="updateUsername()">Save username</button>
+    </div>
+
+    <div class="form-card" style="margin-top:16px">
+      <h3 style="margin-top:0">Settings</h3>
+      <div class="row"><span>Dark mode</span><button class="btn secondary" id="darkModeBtn" onclick="toggleDarkMode()">Turn on</button></div>
+      <div class="row" style="margin-top:10px"><span>Email notifications</span><button class="btn secondary" id="notifBtn" onclick="toggleNotifications()">On</button></div>
+    </div>
+
+    <div class="form-card" style="margin-top:16px">
+      <h3 style="margin-top:0">Danger zone</h3>
+      <p class="muted">Deleting your account permanently removes your BobaJob record. This can't be undone.</p>
+      <button class="btn danger" onclick="deleteAccount()">Delete my account</button>
+    </div>
   </section>
 
   <div class="footer">BobaJob · A full launch needs secure authentication, safeguarding, moderation, privacy and legal review.</div>
@@ -444,11 +523,12 @@ const ACCOUNT_TABLE = 'account';
 const JOBS_TABLE = 'jobs';
 const CHATS_TABLE = 'chats';
 const MESSAGES_TABLE = 'messages';
+const AVATAR_BUCKET = 'avatars';
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let jobsCache = [];
 let pageHistory = [];
-let currentUser = null; // { email, username, age, role, parent_email } while signed in
+let currentUser = null; // { email, username, age, role, parent_email, avatar_url } while signed in
 let activeChat = null;  // the chat row currently open in the modal
 let chatChannel = null; // realtime subscription for the open chat
 
@@ -472,15 +552,15 @@ function goBack() {
 }
 
 // Opens whichever dashboard matches the signed-in user's role, and loads
-// that dashboard's pending-approval list.
+// that dashboard's pending + approved lists.
 function openDashboard() {
   if (!currentUser) { signin(); return; }
   if (currentUser.role === 'child') {
     page('teen');
-    loadTeenPendingJobs();
+    refreshTeenJobLists();
   } else {
     page('adult');
-    loadPendingJobs();
+    refreshAdultJobLists();
   }
 }
 
@@ -489,6 +569,23 @@ function openChatsPage() {
   if (!currentUser) { signin(); return; }
   page('chats');
   loadChats();
+}
+
+// Opens the signed-in user's profile page.
+function openProfilePage() {
+  if (!currentUser) { signin(); return; }
+  page('profile');
+  renderProfilePage();
+}
+
+function refreshAdultJobLists() {
+  loadPendingJobs();
+  loadApprovedJobs();
+}
+
+function refreshTeenJobLists() {
+  loadTeenPendingJobs();
+  loadTeenApprovedJobs();
 }
 
 function openSidebar() {
@@ -585,11 +682,11 @@ async function handleSignin() {
       msg.textContent = 'No account matches that email and password.';
       return;
     }
-    currentUser = { email: data.email, username: data.username, age: data.age, role: data.role, parent_email: data.parent_email || null };
+    setCurrentUserFromRow(data);
     updateAuthUI();
     closeModal();
-    page(currentUser.role === 'child' ? 'teen' : 'adult');
-    if (currentUser.role === 'child') loadTeenPendingJobs(); else loadPendingJobs();
+    if (currentUser.role === 'child') { page('teen'); refreshTeenJobLists(); }
+    else { page('adult'); refreshAdultJobLists(); }
   } catch (error) {
     console.error(error);
     msg.className = 'notice warning';
@@ -598,6 +695,17 @@ async function handleSignin() {
     btn.disabled = false;
     btn.textContent = 'Sign in';
   }
+}
+
+function setCurrentUserFromRow(row) {
+  currentUser = {
+    email: row.email,
+    username: row.username,
+    age: row.age,
+    role: row.role,
+    parent_email: row.parent_email || null,
+    avatar_url: row.avatar_url || null
+  };
 }
 
 // Shows the parent/guardian email + password fields only for under-18 signups.
@@ -678,11 +786,11 @@ document.getElementById('accountForm').addEventListener('submit', async e => {
     message.className = 'notice success';
     message.textContent = 'Account created — signing you in...';
     form.reset();
-    currentUser = { email: row.email, username: row.username, age: row.age, role: row.role, parent_email: row.parent_email };
+    setCurrentUserFromRow(row);
     updateAuthUI();
     setTimeout(() => {
-      page(currentUser.role === 'child' ? 'teen' : 'adult');
-      if (currentUser.role === 'child') loadTeenPendingJobs(); else loadPendingJobs();
+      if (currentUser.role === 'child') { page('teen'); refreshTeenJobLists(); }
+      else { page('adult'); refreshAdultJobLists(); }
     }, 700);
   } catch (error) {
     console.error(error);
@@ -793,7 +901,8 @@ async function submitJob() {
       location: location,
       price: price,
       set_up_by: setUpBy,
-      taken: false
+      taken: false,
+      approved: false
     }]);
     if (error) throw error;
     msg.className = 'notice success';
@@ -837,19 +946,12 @@ async function claimJob(id) {
 }
 
 // Parent/adult dashboard: lists jobs claimed by the signed-in parent's own
-// linked teens. Approving here is one click since the parent is already
-// signed in on their own account.
+// linked teens, that haven't been approved yet.
 async function loadPendingJobs() {
   const container = document.getElementById('pendingJobs');
   if (!container || !currentUser || currentUser.role !== 'parent') return;
   try {
-    const { data: teens, error: teenErr } = await supabaseClient
-      .from(ACCOUNT_TABLE)
-      .select('email')
-      .eq('role', 'child')
-      .eq('parent_email', currentUser.email);
-    if (teenErr) throw teenErr;
-    const teenEmails = (teens || []).map(t => t.email);
+    const teenEmails = await getLinkedTeenEmails();
     if (!teenEmails.length) {
       container.innerHTML = '<p class="muted">No linked teen accounts yet.</p>';
       return;
@@ -858,6 +960,7 @@ async function loadPendingJobs() {
       .from(JOBS_TABLE)
       .select('*')
       .eq('taken', true)
+      .eq('approved', false)
       .in('taken_by', teenEmails)
       .order('created_at', { ascending: false });
     if (error) throw error;
@@ -879,9 +982,53 @@ async function loadPendingJobs() {
   }
 }
 
-// Teen dashboard: lists jobs the signed-in teen themself claimed. Approving
-// here requires the linked parent/guardian to type their own password, since
-// it's the teen's device that's signed in, not the parent's.
+// Parent/adult dashboard: jobs already approved. Shows a Chat button instead
+// of Approve/Decline.
+async function loadApprovedJobs() {
+  const container = document.getElementById('approvedJobs');
+  if (!container || !currentUser || currentUser.role !== 'parent') return;
+  try {
+    const teenEmails = await getLinkedTeenEmails();
+    if (!teenEmails.length) {
+      container.innerHTML = '<p class="muted">No linked teen accounts yet.</p>';
+      return;
+    }
+    const { data, error } = await supabaseClient
+      .from(JOBS_TABLE)
+      .select('*')
+      .eq('taken', true)
+      .eq('approved', true)
+      .in('taken_by', teenEmails)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data || !data.length) {
+      container.innerHTML = '<p class="muted">No approved jobs yet.</p>';
+      return;
+    }
+    container.innerHTML = data.map(j => `
+      <div class="item">
+        <div><span class="tag approved">Approved</span><br><b>${j.title || 'Untitled job'}</b><div class="muted">£${j.price ?? ''} · ${j.location || 'Location not specified'}</div></div>
+        <button class="btn secondary" onclick="openChatForJob(${j.id})">Chat</button>
+      </div>`).join('');
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = '<p class="muted">Could not load approved jobs.</p>';
+  }
+}
+
+async function getLinkedTeenEmails() {
+  const { data, error } = await supabaseClient
+    .from(ACCOUNT_TABLE)
+    .select('email')
+    .eq('role', 'child')
+    .eq('parent_email', currentUser.email);
+  if (error) throw error;
+  return (data || []).map(t => t.email);
+}
+
+// Teen dashboard: lists jobs the signed-in teen themself claimed that are
+// still waiting. Approving here requires the linked parent/guardian to type
+// their own password, since it's the teen's device that's signed in.
 async function loadTeenPendingJobs() {
   const container = document.getElementById('teenPendingJobs');
   if (!container || !currentUser || currentUser.role !== 'child') return;
@@ -890,6 +1037,7 @@ async function loadTeenPendingJobs() {
       .from(JOBS_TABLE)
       .select('*')
       .eq('taken', true)
+      .eq('approved', false)
       .eq('taken_by', currentUser.email)
       .order('created_at', { ascending: false });
     if (error) throw error;
@@ -911,8 +1059,37 @@ async function loadTeenPendingJobs() {
   }
 }
 
+// Teen dashboard: jobs already approved, with a Chat button.
+async function loadTeenApprovedJobs() {
+  const container = document.getElementById('teenApprovedJobs');
+  if (!container || !currentUser || currentUser.role !== 'child') return;
+  try {
+    const { data, error } = await supabaseClient
+      .from(JOBS_TABLE)
+      .select('*')
+      .eq('taken', true)
+      .eq('approved', true)
+      .eq('taken_by', currentUser.email)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data || !data.length) {
+      container.innerHTML = '<p class="muted">No approved jobs yet.</p>';
+      return;
+    }
+    container.innerHTML = data.map(j => `
+      <div class="item">
+        <div><span class="tag approved">Approved</span><br><b>${j.title || 'Untitled job'}</b><div class="muted">£${j.price ?? ''} · ${j.location || 'Location not specified'}</div></div>
+        <button class="btn secondary" onclick="openChatForJob(${j.id})">Chat</button>
+      </div>`).join('');
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = '<p class="muted">Could not load approved jobs.</p>';
+  }
+}
+
 // Parent one-click approval (used on the parent's own dashboard). Creates the
-// job chat, then permanently removes the job from the site.
+// job chat, then marks the job approved — it moves to the Approved jobs list
+// instead of disappearing.
 async function approveJob(id) {
   try {
     const { data: job, error: fetchErr } = await supabaseClient.from(JOBS_TABLE).select('*').eq('id', id).maybeSingle();
@@ -927,11 +1104,10 @@ async function approveJob(id) {
       }]);
       if (chatErr) throw chatErr;
     }
-    const { error } = await supabaseClient.from(JOBS_TABLE).delete().eq('id', id);
+    const { error } = await supabaseClient.from(JOBS_TABLE).update({ approved: true }).eq('id', id);
     if (error) throw error;
     loadJobs();
-    loadPendingJobs();
-    alert('Approved! A chat with the host has been created — find it on the Chats page.');
+    refreshAdultJobLists();
   } catch (error) {
     console.error(error);
     alert('Could not approve the job: ' + error.message);
@@ -939,7 +1115,7 @@ async function approveJob(id) {
 }
 
 // Approval from the teen's dashboard: the parent must type their own
-// password, which is checked against their account before the job is removed.
+// password, checked against their account before the job is marked approved.
 async function approveFromTeen(id) {
   const input = document.getElementById(`parentPw-${id}`);
   const pw = input ? input.value : '';
@@ -976,11 +1152,10 @@ async function approveFromTeen(id) {
       }]);
       if (chatErr) throw chatErr;
     }
-    const { error: delErr } = await supabaseClient.from(JOBS_TABLE).delete().eq('id', id);
-    if (delErr) throw delErr;
+    const { error: updErr } = await supabaseClient.from(JOBS_TABLE).update({ approved: true }).eq('id', id);
+    if (updErr) throw updErr;
     loadJobs();
-    loadTeenPendingJobs();
-    alert('Approved! A chat with the host has been created — find it on the Chats page.');
+    refreshTeenJobLists();
   } catch (error) {
     console.error(error);
     alert('Could not approve the job: ' + error.message);
@@ -990,13 +1165,26 @@ async function approveFromTeen(id) {
 // Declining re-opens the job so it's visible in listings again.
 async function declineJob(id) {
   try {
-    const { error } = await supabaseClient.from(JOBS_TABLE).update({ taken: false, taken_by: null }).eq('id', id);
+    const { error } = await supabaseClient.from(JOBS_TABLE).update({ taken: false, taken_by: null, approved: false }).eq('id', id);
     if (error) throw error;
     loadJobs();
-    loadPendingJobs();
+    refreshAdultJobLists();
   } catch (error) {
     console.error(error);
     alert('Could not decline the job: ' + error.message);
+  }
+}
+
+// Finds the chat linked to a job and opens it.
+async function openChatForJob(jobId) {
+  try {
+    const { data, error } = await supabaseClient.from(CHATS_TABLE).select('id').eq('job_id', jobId).maybeSingle();
+    if (error) throw error;
+    if (!data) { alert('Chat not found for this job.'); return; }
+    openChat(data.id);
+  } catch (error) {
+    console.error(error);
+    alert('Could not open chat: ' + error.message);
   }
 }
 
@@ -1133,6 +1321,89 @@ async function sendMessage() {
 }
 
 /* ==========================================================
+   Profile
+   ========================================================== */
+function renderProfilePage() {
+  document.getElementById('profileGreeting').textContent = `Hi, ${currentUser.username || currentUser.email}`;
+  document.getElementById('profileDetails').textContent =
+    `${currentUser.email} · ${currentUser.role === 'child' ? 'Teen' : 'Parent/guardian'} account`;
+  document.getElementById('profileUsername').value = currentUser.username || '';
+
+  const circle = document.getElementById('avatarCircle');
+  circle.innerHTML = currentUser.avatar_url ? `<img src="${currentUser.avatar_url}" alt="Profile picture">` : '🙂';
+
+  const darkBtn = document.getElementById('darkModeBtn');
+  darkBtn.textContent = document.body.classList.contains('dark') ? 'Turn off' : 'Turn on';
+}
+
+async function uploadAvatar() {
+  const fileInput = document.getElementById('avatarFile');
+  const file = fileInput.files[0];
+  if (!file || !currentUser) {
+    alert('Choose an image first.');
+    return;
+  }
+  const path = `${currentUser.email}-${Date.now()}.${file.name.split('.').pop()}`;
+  try {
+    const { error: uploadErr } = await supabaseClient.storage.from(AVATAR_BUCKET).upload(path, file, { upsert: true });
+    if (uploadErr) throw uploadErr;
+    const { data: urlData } = supabaseClient.storage.from(AVATAR_BUCKET).getPublicUrl(path);
+    const avatarUrl = urlData.publicUrl;
+    const { error: updateErr } = await supabaseClient.from(ACCOUNT_TABLE).update({ avatar_url: avatarUrl }).eq('email', currentUser.email);
+    if (updateErr) throw updateErr;
+    currentUser.avatar_url = avatarUrl;
+    renderProfilePage();
+  } catch (error) {
+    console.error(error);
+    alert('Could not upload picture: ' + error.message);
+  }
+}
+
+async function updateUsername() {
+  const newUsername = document.getElementById('profileUsername').value.trim();
+  if (!newUsername || !currentUser) return;
+  try {
+    const { error } = await supabaseClient.from(ACCOUNT_TABLE).update({ username: newUsername }).eq('email', currentUser.email);
+    if (error) throw error;
+    currentUser.username = newUsername;
+    updateAuthUI();
+    renderProfilePage();
+  } catch (error) {
+    console.error(error);
+    alert('Could not update username: ' + error.message);
+  }
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+  localStorage.setItem('bobajob-dark', document.body.classList.contains('dark') ? '1' : '0');
+  const darkBtn = document.getElementById('darkModeBtn');
+  if (darkBtn) darkBtn.textContent = document.body.classList.contains('dark') ? 'Turn off' : 'Turn on';
+}
+
+function toggleNotifications() {
+  const btn = document.getElementById('notifBtn');
+  const on = btn.textContent.trim() === 'On';
+  btn.textContent = on ? 'Off' : 'On';
+}
+
+async function deleteAccount() {
+  if (!currentUser) return;
+  const confirmed = confirm('This will permanently delete your BobaJob account. Are you sure?');
+  if (!confirmed) return;
+  try {
+    const { error } = await supabaseClient.from(ACCOUNT_TABLE).delete().eq('email', currentUser.email);
+    if (error) throw error;
+    currentUser = null;
+    updateAuthUI();
+    page('home');
+  } catch (error) {
+    console.error(error);
+    alert('Could not delete account: ' + error.message);
+  }
+}
+
+/* ==========================================================
    Init
    ========================================================== */
 document.getElementById('modal').addEventListener('click', e => {
@@ -1141,6 +1412,7 @@ document.getElementById('modal').addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeSidebar();
 });
+if (localStorage.getItem('bobajob-dark') === '1') document.body.classList.add('dark');
 updateAuthUI();
 loadJobs();
 </script>
