@@ -202,6 +202,20 @@ body.dark .dialog { background: var(--card); }
 
 .footer { text-align: center; color: var(--muted); font-size: 12px; padding: 26px; }
 .pill { padding: 6px 10px; border-radius: 99px; background: #eef3f1; font-size: 12px; font-weight: 900; }
+.tag-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--pale);
+  padding: 6px 12px 6px 8px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  color: var(--ink);
+}
+.tag-check input { margin: 0; }
+body.dark .pill { background: var(--card); }
 
 /* ---------- Mobile sidebar ---------- */
 .menuBtn {
@@ -238,9 +252,13 @@ body.dark .dialog { background: var(--card); }
   display: flex;
   flex-direction: column;
   padding: 18px;
+  padding-bottom: max(18px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .sidebar.open { right: 0; }
-.sidebar-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.sidebar-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; position: sticky; top: 0; background: #fff; padding-top: 2px; z-index: 1; }
+body.dark .sidebar-head { background: var(--card); }
 .sidebar-head .logo { font-size: 20px; }
 .sidebar-label { font-size: 11px; font-weight: 950; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin: 16px 10px 4px; }
 .sidebar nav { display: flex; flex-direction: column; gap: 2px; }
@@ -377,7 +395,7 @@ body.dark .dialog { background: var(--card); }
   <section id="jobs" class="page">
     <div class="head">
       <div><h2>Find jobs</h2><p class="muted">Browse local opportunities. Rewards are shown as task payments, not virtual currency.</p></div>
-      <button class="btn secondary" onclick="alert('Filters: distance, category, reward, date and age suitability.')">Filter</button>
+      <button class="btn secondary" id="filterBtn" onclick="openFilters()">Filter</button>
     </div>
     <div class="grid" id="jobsGrid"></div>
   </section>
@@ -534,6 +552,12 @@ let pageHistory = [];
 let currentUser = null; // { email, username, age, role, parent_email, avatar_url } while signed in
 let activeChat = null;  // the chat row currently open in the modal
 let chatChannel = null; // realtime subscription for the open chat
+
+// Fixed category list, shared by job posting and the filter panel.
+const JOB_TAGS = ['Gardening', 'Pet care', 'Dog walking', 'Babysitting', 'Tutoring', 'Cleaning', 'Moving & lifting', 'Car washing', 'Event help', 'Tech help', 'Errands', 'Other'];
+
+// Current filter/sort state for the "Find jobs" grid.
+let jobFilters = { tags: [], minPrice: null, maxPrice: null, location: '', sort: 'newest' };
 
 /* ==========================================================
    Navigation
@@ -904,25 +928,116 @@ async function loadJobs() {
 }
 
 function cards(list) {
-  return list.map((j, i) => `
+  return list.map(j => `
     <article class="card">
       <span class="tag">Open</span>
+      ${tagPills(j.tags)}
       <h3>${j.title || 'Untitled job'}</h3>
       <p class="muted">${j.description || ''}</p>
       <p class="muted">📍 ${j.location || 'Location not specified'}</p>
       <div class="row"><span>${j.set_up_by || ''}</span><span class="reward">£${j.price ?? ''}</span></div>
-      <button class="btn secondary" style="margin-top:14px;width:100%" onclick="viewJob(${i})">View job</button>
+      <button class="btn secondary" style="margin-top:14px;width:100%" onclick="viewJob(${j.id})">View job</button>
     </article>`).join('');
+}
+
+function tagPills(tags) {
+  if (!tags || !tags.length) return '';
+  return `<div style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0">${tags.map(t => `<span class="pill">${t}</span>`).join('')}</div>`;
 }
 
 function renderJobs() {
   const empty = '<p class="muted">No jobs posted yet.</p>';
   document.getElementById('homeJobs').innerHTML = jobsCache.length ? cards(jobsCache.slice(0, 3)) : empty;
-  document.getElementById('jobsGrid').innerHTML = jobsCache.length ? cards(jobsCache) : empty;
+  renderJobsGrid();
 }
 
-function viewJob(i) {
-  const j = jobsCache[i];
+// Applies the current filter/sort state to the "Find jobs" grid, leaving the
+// homepage's "Popular jobs" preview unfiltered.
+function renderJobsGrid() {
+  const filtered = filteredJobs();
+  const empty = jobsCache.length ? '<p class="muted">No jobs match your filters.</p>' : '<p class="muted">No jobs posted yet.</p>';
+  document.getElementById('jobsGrid').innerHTML = filtered.length ? cards(filtered) : empty;
+}
+
+function filteredJobs() {
+  const list = jobsCache.filter(j => {
+    if (jobFilters.tags.length) {
+      const jobTags = j.tags || [];
+      if (!jobFilters.tags.some(t => jobTags.includes(t))) return false;
+    }
+    if (jobFilters.minPrice != null && (j.price ?? 0) < jobFilters.minPrice) return false;
+    if (jobFilters.maxPrice != null && (j.price ?? 0) > jobFilters.maxPrice) return false;
+    if (jobFilters.location && !(j.location || '').toLowerCase().includes(jobFilters.location.toLowerCase())) return false;
+    return true;
+  });
+  if (jobFilters.sort === 'price_low') list.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+  else if (jobFilters.sort === 'price_high') list.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+  else list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  return list;
+}
+
+function openFilters() {
+  openModal(`
+    <h2>Filter jobs</h2>
+    <div class="field">
+      <label>Category</label>
+      <div id="filterTagChecks" style="display:flex;flex-wrap:wrap;gap:8px">
+        ${JOB_TAGS.map(t => `<label class="tag-check"><input type="checkbox" value="${t}" ${jobFilters.tags.includes(t) ? 'checked' : ''}> ${t}</label>`).join('')}
+      </div>
+    </div>
+    <div class="row" style="gap:12px;align-items:flex-start">
+      <div class="field" style="flex:1"><label for="filterMin">Min price (£)</label><input id="filterMin" type="number" min="0" value="${jobFilters.minPrice ?? ''}"></div>
+      <div class="field" style="flex:1"><label for="filterMax">Max price (£)</label><input id="filterMax" type="number" min="0" value="${jobFilters.maxPrice ?? ''}"></div>
+    </div>
+    <div class="field"><label for="filterLocation">Location contains</label><input id="filterLocation" placeholder="e.g. Esher" value="${jobFilters.location || ''}"></div>
+    <div class="field">
+      <label for="filterSort">Sort by</label>
+      <select id="filterSort">
+        <option value="newest" ${jobFilters.sort === 'newest' ? 'selected' : ''}>Newest first</option>
+        <option value="price_low" ${jobFilters.sort === 'price_low' ? 'selected' : ''}>Price: low to high</option>
+        <option value="price_high" ${jobFilters.sort === 'price_high' ? 'selected' : ''}>Price: high to low</option>
+      </select>
+    </div>
+    <div class="actions">
+      <button class="btn primary" onclick="applyFilters()">Apply filters</button>
+      <button class="btn secondary" onclick="clearFilters()">Clear all</button>
+    </div>
+  `);
+}
+
+function applyFilters() {
+  jobFilters.tags = Array.from(document.querySelectorAll('#filterTagChecks input:checked')).map(el => el.value);
+  const min = document.getElementById('filterMin').value;
+  const max = document.getElementById('filterMax').value;
+  jobFilters.minPrice = min !== '' ? parseInt(min, 10) : null;
+  jobFilters.maxPrice = max !== '' ? parseInt(max, 10) : null;
+  jobFilters.location = document.getElementById('filterLocation').value.trim();
+  jobFilters.sort = document.getElementById('filterSort').value;
+  closeModal();
+  renderJobsGrid();
+  updateFilterButton();
+}
+
+function clearFilters() {
+  jobFilters = { tags: [], minPrice: null, maxPrice: null, location: '', sort: 'newest' };
+  closeModal();
+  renderJobsGrid();
+  updateFilterButton();
+}
+
+function updateFilterButton() {
+  const btn = document.getElementById('filterBtn');
+  if (!btn) return;
+  const count = jobFilters.tags.length
+    + (jobFilters.minPrice != null ? 1 : 0)
+    + (jobFilters.maxPrice != null ? 1 : 0)
+    + (jobFilters.location ? 1 : 0)
+    + (jobFilters.sort !== 'newest' ? 1 : 0);
+  btn.textContent = count ? `Filter (${count})` : 'Filter';
+}
+
+function viewJob(id) {
+  const j = jobsCache.find(x => x.id === id);
   if (!j) return;
 
   // Only a signed-in teen can accept a job; parents are explicitly blocked.
@@ -954,6 +1069,12 @@ function postJob() {
     <div class="field"><label for="jobLocation">Location</label><input id="jobLocation" required placeholder="e.g. Esher, Surrey"></div>
     <div class="field"><label for="jobPrice">Price (£)</label><input id="jobPrice" type="number" value="15" min="1"></div>
     <div class="field"><label for="jobSetupBy">Posted by (name or email)</label><input id="jobSetupBy" placeholder="you@example.com"></div>
+    <div class="field">
+      <label>Tags (pick all that apply)</label>
+      <div id="jobTagChecks" style="display:flex;flex-wrap:wrap;gap:8px">
+        ${JOB_TAGS.map(t => `<label class="tag-check"><input type="checkbox" value="${t}"> ${t}</label>`).join('')}
+      </div>
+    </div>
     <div id="jobMessage" class="notice">Listings should pass safety and moderation checks before being shown to teenagers.</div>
     <button class="btn primary" id="jobSubmitBtn" onclick="submitJob()">Submit for review</button>
   `);
@@ -965,6 +1086,7 @@ async function submitJob() {
   const location = document.getElementById('jobLocation').value.trim();
   const price = parseInt(document.getElementById('jobPrice').value, 10);
   const setUpBy = document.getElementById('jobSetupBy').value.trim();
+  const tags = Array.from(document.querySelectorAll('#jobTagChecks input:checked')).map(el => el.value);
   const msg = document.getElementById('jobMessage');
   const btn = document.getElementById('jobSubmitBtn');
 
@@ -983,6 +1105,7 @@ async function submitJob() {
       location: location,
       price: price,
       set_up_by: setUpBy,
+      tags: tags,
       taken: false,
       approved: false
     }]);
@@ -993,6 +1116,7 @@ async function submitJob() {
     document.getElementById('jobDesc').value = '';
     document.getElementById('jobLocation').value = '';
     document.getElementById('jobSetupBy').value = '';
+    document.querySelectorAll('#jobTagChecks input:checked').forEach(el => el.checked = false);
     loadJobs();
   } catch (error) {
     console.error(error);
